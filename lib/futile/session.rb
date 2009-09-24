@@ -15,7 +15,7 @@ class Futile::Session
       @no_redirects += 1
     end
     if infinite_redirect?
-      raise "Infinite redirect"
+      raise ResistanceIsFutile.new("Ifinite redirects in %p" % uri)
     else
       @response
     end

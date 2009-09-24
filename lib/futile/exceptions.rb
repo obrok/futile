@@ -1,0 +1,2 @@
+class ResistanceIsFutile < Exception
+end
