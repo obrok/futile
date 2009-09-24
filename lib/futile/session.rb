@@ -30,6 +30,10 @@ class Futile::Session
     @no_redirects > 0
   end
 
+  def disconnect
+    @session.finish
+  end
+
   private
   def session
     @session

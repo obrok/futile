@@ -16,4 +16,9 @@ server.mount_proc("/infinite_redirect") do |req, resp|
   resp.status = 302
 end
 
+server.mount_proc("/single_redirect") do |req, resp|
+  resp["Location"] = "/simple_get"
+  resp.status = 302
+end
+
 server.start
