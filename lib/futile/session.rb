@@ -16,7 +16,7 @@ class Futile::Session
       follow_redirect
     end
     if infinite_redirect?
-      raise RedirectIsFutile.new("Infinite redirect for %p" % @uri)
+      raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri)
     else
       response
     end

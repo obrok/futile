@@ -1,5 +1,5 @@
-class ResistanceIsFutile < Exception
+class Futile::ResistanceIsFutile < Exception
 end
 
-class RedirectIsFutile < ResistanceIsFutile
+class Futile::RedirectIsFutile < Futile::ResistanceIsFutile
 end
