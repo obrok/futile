@@ -4,4 +4,5 @@ require "net/http"
 module Futile
 end
 
-require File.join("futile", "session")
+require "futile/response"
+require "futile/session"
