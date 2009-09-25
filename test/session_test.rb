@@ -1,4 +1,5 @@
-require "test/test_helper.rb"
+# -*- coding: utf-8 -*-
+require File.join("test", "test_helper")
 
 class SessionTest < Futile::TestCase
   def test_basic_get
@@ -12,5 +13,19 @@ class SessionTest < Futile::TestCase
       @futile.get("/infinite_redirect")
     end
     assert @futile.redirected?
+  end
+
+  ["Jakiś tekst", '//a', 'html > body > a'].each_with_index do |locator, index|
+    define_method "test_find_link(#{locator})".to_sym do
+      TestServer.content = <<-HTML
+      <html>
+        <body>
+          <a href="wp.pl">Jakiś tekst</a>
+        </body>
+      </html>
+      HTML
+      @futile.get('/')
+      assert_equal("<a href=\"wp.pl\">Jakiś tekst</a>", @futile.find_link(locator))
+    end
   end
 end

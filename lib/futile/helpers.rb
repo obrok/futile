@@ -1,7 +1,7 @@
 module Futile::Helpers
   def fill(where, what)
     element = response.parsed_body.at("//input[@name='%s']" % [where])
-    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [where]) if not element
+    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [where]) unless element
     params[element["name"]] = what
   end
 
@@ -12,6 +12,16 @@ module Futile::Helpers
   end
 
   def uncheck(what)
+  end
+
+  def find_link(locator)
+    #First try to treat it as a CSS or XPath locator
+    element = response.parsed_body.at(locator)
+    #If that doesn't work search for an a tag matching the specified text
+    response.parsed_body.xpath('//a').each do |el|
+      return el.to_s if el.to_s.include?(locator)
+    end unless element
+    element.to_s
   end
 
   private
