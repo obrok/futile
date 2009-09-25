@@ -1,16 +1,14 @@
 class Futile::Session
-  attr_reader :response
+  attr_reader :response, :params
 
   def initialize(url, port, opts = {})
     @session = Net::HTTP.start(url, port)
     @max_redirects = opts[:max_redirects] || 10
-    @no_redirects = 0
   end
 
   def get(uri)
+    reset_state
     @uri = uri
-    @uri = "/%s" % @uri if @uri[0, 1] != "/"
-    @no_redirects = 0
     @response = Futile::Response.new(session.get(@uri))
     while response.redirect? and not infinite_redirect?
       follow_redirect
@@ -47,5 +45,11 @@ class Futile::Session
     @uri = response.headers["location"]
     @response = Futile::Response.new(session.get(@uri))
     @no_redirects += 1
+  end
+
+  def reset_state
+    @no_redirects = 0
+    @uri = nil
+    @params = {}
   end
 end
