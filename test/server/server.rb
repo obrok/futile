@@ -41,7 +41,7 @@ module TestServer
     resp.status = 200
   end
 
-  server.mount_proc("/form") do |req, resp|
+  SERVER.mount_proc("/form") do |req, resp|
     resp.body = parse_erb("form.erb")
   end
 

@@ -1,6 +1,6 @@
 require 'test/unit'
 require File.join("lib", "futile")
-require File.join("test", "test_server")
+require File.join("test", "server", "server")
 
 class Futile::TestCase < Test::Unit::TestCase
   def setup
