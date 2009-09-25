@@ -1,9 +1,11 @@
 module Futile::Helpers
-  def select(from, what)
-    p params_to_string
+  def fill(where, what)
+    element = response.parsed_body.at("//input[@name='%s']" % [where])
+    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [where]) if not element
+    params[element["name"]] = what
   end
 
-  def type(where, what)
+  def select(from, what)
   end
 
   def check(what)

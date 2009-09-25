@@ -1,4 +1,6 @@
 class Futile::Session
+  include Futile::Helpers
+
   attr_reader :response, :params
 
   def initialize(url, port, opts = {})

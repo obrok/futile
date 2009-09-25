@@ -28,4 +28,8 @@ server.mount_proc("/single_redirect") do |req, resp|
   resp.status = 302
 end
 
+server.mount_proc("/form") do |req, resp|
+  resp.body = parse_erb("form.erb")
+end
+
 server.start
