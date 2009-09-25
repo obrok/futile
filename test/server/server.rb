@@ -1,14 +1,21 @@
 require "rubygems"
+require "erb"
 require "webrick"
 
 include WEBrick
 module TestServer
+  def self.parse_erb(path, context = {})
+    erb = ERB.new(File.read("test/server/%s" % [path]))
+    context.each { |k, v| eval("%s = %s" % [k, v]) }
+    erb.result(binding)
+  end
+
   SERVER = HTTPServer.new(:Port => 6666, 
                           :Logger => Log.new(nil, BasicLog::WARN),
                           :AccessLog => [])
 
   ["INT", "TERM"].each { |signal|
-    trap(signal) { server.shutdown }
+    trap(signal) { SERVER.shutdown }
   }
 
   SERVER.mount_proc("/simple_get") do |req, resp|
@@ -32,6 +39,10 @@ module TestServer
   SERVER.mount_proc("/") do |req, resp|
     resp.body = @@content
     resp.status = 200
+  end
+
+  server.mount_proc("/form") do |req, resp|
+    resp.body = parse_erb("form.erb")
   end
 
   Thread.fork do

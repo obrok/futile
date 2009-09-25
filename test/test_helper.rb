@@ -1,4 +1,4 @@
-require "test/unit"
+require 'test/unit'
 require File.join("lib", "futile")
 require File.join("test", "test_server")
 

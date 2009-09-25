@@ -11,4 +11,8 @@ class Futile::Response
   def redirect?
     status / 100 == 3
   end
+
+  def parsed_body
+    @parsed_body ||= Nokogiri.parse(@body)
+  end
 end
