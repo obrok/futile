@@ -96,4 +96,10 @@ class SessionTest < Futile::TestCase
     @futile.click_link("anchor!!!1")
     assert_equal "/simple_get#only_anchor", @futile.path
   end
+
+  def test_anchored_link_returns_response
+    @futile.get("/simple_get")
+    response = @futile.click_link("anchor!!!1")
+    assert response.is_a?(Futile::Response)
+  end
 end
