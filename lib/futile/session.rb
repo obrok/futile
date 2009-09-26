@@ -4,7 +4,7 @@
 class Futile::Session
   include Futile::Helpers
 
-  attr_reader :response, :params
+  attr_reader :response
 
   ##
   # Initialize with url/port of the tested page.
@@ -107,7 +107,11 @@ class Futile::Session
       # cannot type if the element is not a text field, password field or textarea
       raise Futile::SearchIsFutile.new("Cannot type into '%s'" % [element])
     end
-    params[element["name"]] = what
+    if element.name == "input"
+      element["value"] = what
+    else
+      element.inner_html = what
+    end
   end
 
   def select(locator, what)
@@ -119,7 +123,7 @@ class Futile::Session
     if checkbox.name != "input" or checkbox["type"] != "checkbox"
       raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
     end
-    params[checkbox["name"]] = value
+    checkbox["value"] = value
   end
 
   def uncheck(locator)
@@ -143,6 +147,5 @@ class Futile::Session
   def reset_state
     @no_redirects = 0
     @uri = nil
-    @params = {}
   end
 end

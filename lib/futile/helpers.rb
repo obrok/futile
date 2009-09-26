@@ -36,8 +36,4 @@ module Futile::Helpers
     end
     element
   end
-
-  def params_to_string
-    params.map { |k, v| "%s=%s" % [k, v] }.sort.join("&")
-  end
 end
