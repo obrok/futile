@@ -117,6 +117,16 @@ class Futile::Session
   def select(locator, what)
   end
 
+  ##
+  # Use this method to check a checkbox input specified by _locator_.
+  #
+  #
+  #  # => <input type="checkbox" name="foo" value="on">
+  #  session.check("foo") # => <input type="checkbox" name="foo" value="on" checked>
+  #
+  # @param [String] locator label/name of checkbox
+  # @raise [Futile::SearchIsFutile] raised when element not found
+  # @raise [Futile::CheckIsFutile] raised when checkbox is already checked
   def check(locator)
     checkbox = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
@@ -129,6 +139,16 @@ class Futile::Session
     checkbox["checked"] = "checked"
   end
 
+  ##
+  # Use this method to uncheck a checkbox input specified by _locator_.
+  #
+  #
+  #  # => <input type="checkbox" name="foo" value="on" checked>
+  #  session.uncheck("foo") # => <input type="checkbox" name="foo" value="on">
+  #
+  # @param [String] locator label/name of checkbox
+  # @raise [Futile::SearchIsFutile] raised when element not found
+  # @raise [Futile::CheckIsFutile] raised when checkbox is not checked
   def uncheck(locator)
     checkbox = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
