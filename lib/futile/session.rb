@@ -117,13 +117,16 @@ class Futile::Session
   def select(locator, what)
   end
 
-  def check(locator, value = "on")
+  def check(locator)
     checkbox = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
     if checkbox.name != "input" or checkbox["type"] != "checkbox"
       raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
     end
-    checkbox["value"] = value
+    if checkbox["checked"]
+      raise Futile::CheckIsFutile.new("Element '%s' already checked" % [checkbox])
+    end
+    checkbox["checked"] = "checked"
   end
 
   def uncheck(locator)

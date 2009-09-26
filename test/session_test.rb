@@ -103,16 +103,22 @@ class SessionTest < Futile::TestCase
     assert response.is_a?(Futile::Response)
   end
 
-  def test_checking_checkbox
-    # <input id="id3" type="checkbox" name="p4"/>
-    @futile.get("/form")
-    @futile.check("p4")
-    assert_equal "on", @futile.response.parsed_body.at("#id3")["value"]
-  end
-
   def test_anchored_link_elswhere
     @futile.get("/simple_get")
     @futile.click_link("anchor elsewhere")
     assert_match("This is the second page", @futile.response.body)
+  end
+
+  def test_checking_checkbox
+    @futile.get("/form")
+    @futile.check("p4")
+    assert @futile.response.parsed_body.at("#id3")["checked"]
+  end
+
+  def test_raise_on_checking_already_checked
+    @futile.get("/form")
+    assert_raises(Futile::CheckIsFutile) do
+      @futile.check("p8")
+    end
   end
 end
