@@ -1,3 +1,5 @@
-pkg
+pkg/
 *.swp
 *~
+.yardoc
+doc/

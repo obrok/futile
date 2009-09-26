@@ -2,6 +2,7 @@ require "rubygems"
 require "rake"
 require "rake/gempackagetask"
 require "rake/testtask"
+require "yard"
 
 PKG_VERSION = "0.0.1"
 PKG_FILES = Dir[File.join("lib", "**", "*.rb")] + Dir[File.join("test", "**", "*.rb")]
@@ -29,6 +30,10 @@ Rake::TestTask.new do |t|
   t.libs << "test"
   t.test_files = FileList[File.join("test", "*_test.rb")]
   t.verbose = true
+end
+
+YARD::Rake::YardocTask.new do |t|
+  t.files = ["lib/**/*.rb"]
 end
 
 desc 'Default: run tests'
