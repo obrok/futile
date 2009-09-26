@@ -1,4 +1,5 @@
 module Futile::Helpers
+  private
   def find_link(locator)
     #First try to treat it as a CSS or XPath locator
     #If that doesn't work search for a tag matching the specified text
@@ -9,7 +10,6 @@ module Futile::Helpers
     element
   end
 
-  private
   def params_to_string
     params.map { |k, v| "%s=%s" % [k, v] }.sort.join("&")
   end

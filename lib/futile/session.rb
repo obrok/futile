@@ -87,6 +87,7 @@ class Futile::Session
     @session.finish
   end
 
+  # TODO refactor this to use finding methods from helper (create if necessary)
   def fill(where, what)
     # first find the only unique label
     labels = response.parsed_body.search("//label[text()='%s']" % where)

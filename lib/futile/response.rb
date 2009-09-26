@@ -8,10 +8,14 @@ class Futile::Response
     @headers = response.each_header { |_, _| }
   end
 
+  ##
+  # @return [Boolean] true if redirected
   def redirect?
     status / 100 == 3
   end
 
+  ##
+  # @return [Nokogiri] response body parsed with Nokogiri
   def parsed_body
     @parsed_body ||= Nokogiri.parse(@body)
   end
