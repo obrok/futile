@@ -37,12 +37,15 @@ class Futile::Session
   #  app.get("/site")
   #
   # @param [String] uri relative path to request
+  # @param [Hash] opts additional options:
+  # :method - 'post' or 'get' - request method
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
-  def get(uri)
+  def get(uri, opts = {})
     reset_state
     @uri = uri
-    @response = Futile::Response.new(session.get(@uri))
+    result = opts[:method] == 'post' ? session.post(@uri, {}) : session.get(@uri)
+    @response = Futile::Response.new(result)
     while response.redirect? and not infinite_redirect?
       follow_redirect
     end
@@ -72,6 +75,21 @@ class Futile::Session
     else
       get(href)
     end
+  end
+
+  ##
+  # Clicks button (HTML tag <submit> or <button>) specified by _locator_. This means
+  # that a request to path found in the containing form's _href_ attribute is
+  # performed with the appropriate method
+  #
+  # @param [String] locator locator to specify a button. This can be either the
+  #        inner html of link or xpath/css locator
+  # @return [Futile::Response] response to the request
+  # @raise [Futile::SearchIsFutile] raised when the button specified by _locator_
+  #        could not be found
+  def click_button(locator)
+    form = find_form(locator)
+    get(form['action'], :method => form['method'] || 'post')
   end
 
   ##

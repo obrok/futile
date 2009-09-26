@@ -1,9 +1,22 @@
 module Futile::Helpers
   private
+  def find_form(button_locator)
+    button = find_element(button_locator, :button) || find_element(button_locator, :submit)
+    find_parent(button, 'form')
+  end
+
   def find_link(locator)
-    #First try to treat it as a CSS or XPath locator
-    #If that doesn't work search for a tag matching the specified text
-    response.parsed_body.xpath('//a').each do |el|
+    find_element(locator, :a)
+  end
+
+  def find_parent(element, type)
+    parent = element.parent
+    parent = parent.parent while parent.name != type
+    parent
+  end
+
+  def find_element(locator, type)
+    response.parsed_body.xpath("//#{type}").each do |el|
       return el if el.to_s.include?(locator)
     end
     element = response.parsed_body.at(locator) rescue nil

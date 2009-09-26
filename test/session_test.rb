@@ -109,6 +109,14 @@ class SessionTest < Futile::TestCase
     assert_match("This is the second page", @futile.response.body)
   end
 
+  [[:submit, :post], [:submit, :get], [:button, :post], [:button, :get]].each do |pair|
+    define_method "test_form_submission_#{pair[0]}_#{pair[1]}" do
+      @futile.get("/form")
+      @futile.click_button("#{pair[0]} #{pair[1]}")
+      assert_equal(pair[1].to_s.upcase, @futile.response.body)
+    end
+  end
+
   def test_checking_checkbox
     @futile.get("/form")
     @futile.check("p4")
