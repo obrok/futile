@@ -102,4 +102,10 @@ class SessionTest < Futile::TestCase
     response = @futile.click_link("anchor!!!1")
     assert response.is_a?(Futile::Response)
   end
+
+  def test_anchored_link_elswhere
+    @futile.get("/simple_get")
+    @futile.click_link("anchor elsewhere")
+    assert_match("This is the second page", @futile.response.body)
+  end
 end
