@@ -3,6 +3,8 @@
 # results.
 class Futile::Session
   include Futile::Helpers
+  GET  = "GET"
+  POST = "POST"
 
   attr_reader :response
 
@@ -25,7 +27,15 @@ class Futile::Session
   end
 
   ##
-  # Performs a simple get on base url.
+  # Perform GET request on _uri_.
+  #
+  # @param [String] uri uri to request
+  # @return [Futile::Response] response from the server to the request
+  def get(uri)
+    request(uri, GET)
+  end
+
+  # Performs a request on _uri_
   # Please mind that the relative uri *must* begin with a slash ('/'), otherwise the
   # request will be invalid.
   #
@@ -34,11 +44,10 @@ class Futile::Session
   # You can pass absolute uri.
   #
   # @param [String] uri relative path to request
-  # @param [Hash] opts additional options:
-  # :method - 'post' or 'get' - request method
+  # @param [String] method request method
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
-  def get(uri, opts = {})
+  def request(uri, method)
     reset_state
     if uri !~ /^\//
       # absolute uri
@@ -47,7 +56,15 @@ class Futile::Session
       @session = Net::HTTP.start(url, port)
     end
     @uri = uri
-    result = opts[:method] == 'post' ? session.post(@uri, {}) : session.get(@uri)
+    method = method.upcase
+    result = case method
+             when GET
+               session.get(@uri)
+             when POST
+               session.post(@uri, {})
+             else
+               raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
+             end
     @response = Futile::Response.new(result)
     while response.redirect? and not infinite_redirect?
       follow_redirect
@@ -92,7 +109,7 @@ class Futile::Session
   #        could not be found
   def click_button(locator)
     form = find_form(locator)
-    get(form['action'], :method => form['method'] || 'post')
+    request(form['action'], form['method'] || POST)
   end
 
   ##
