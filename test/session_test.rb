@@ -30,7 +30,7 @@ class SessionTest < Futile::TestCase
   def test_typing_by_field_name
     @futile.get("/form")
     @futile.fill("p1", "msq")
-    assert_equal "msq", @futile.params["p1"]
+    assert_equal "msq", @futile.response.parsed_body.at("#id0")["value"]
   end
 
   def test_raise_error_when_not_found
@@ -50,13 +50,13 @@ class SessionTest < Futile::TestCase
   def test_can_type_into_field_with_no_type
     @futile.get("/form")
     @futile.fill("p3", "will happen")
-    assert_equal "will happen", @futile.params["p3"]
+    assert_equal "will happen", @futile.response.parsed_body.at("#id2")["value"]
   end
 
   def test_can_type_by_label
     @futile.get("/form")
     @futile.fill("The label", "value5")
-    assert_equal "value5", @futile.params["p2"]
+    assert_equal "value5", @futile.response.parsed_body.at("#id1")["value"]
   end
 
   def test_raise_error_when_same_labels
@@ -69,13 +69,13 @@ class SessionTest < Futile::TestCase
   def test_typing_textarea
     @futile.get("/form")
     @futile.fill("p5", "textarea text")
-    assert_equal "textarea text", @futile.params["p5"]
+    assert_equal "textarea text", @futile.response.parsed_body.at("#id4").inner_html
   end
 
   def test_typing_password_field
     @futile.get("/form")
     @futile.fill("p6", "secret")
-    assert_equal "secret", @futile.params["p6"]
+    assert_equal "secret", @futile.response.parsed_body.at("#id5")["value"]
   end
 
   def test_cannot_type_into_disabled_element
@@ -88,7 +88,7 @@ class SessionTest < Futile::TestCase
   def test_type_into_textarea_by_label
     @futile.get("/form")
     @futile.fill("Body", "new textarea body")
-    assert_equal "new textarea body", @futile.params["p5"]
+    assert_equal "new textarea body", @futile.response.parsed_body.at("#id4").inner_html
   end
 
   def test_click_anchored_link_should_only_change_path
@@ -115,5 +115,24 @@ class SessionTest < Futile::TestCase
       @futile.click_button("#{pair[0]} #{pair[1]}")
       assert_equal(pair[1].to_s.upcase, @futile.response.body)
     end
+  end
+
+  def test_checking_checkbox
+    @futile.get("/form")
+    @futile.check("p4")
+    assert @futile.response.parsed_body.at("#id3")["checked"]
+  end
+
+  def test_raise_on_checking_already_checked
+    @futile.get("/form")
+    assert_raises(Futile::CheckIsFutile) do
+      @futile.check("p8")
+    end
+  end
+
+  def test_unchecking_checkbox
+    @futile.get("/form")
+    @futile.uncheck("p8")
+    assert_nil @futile.response.parsed_body.at("#id6")["checked"]
   end
 end

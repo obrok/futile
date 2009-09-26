@@ -43,18 +43,10 @@ module Futile::Helpers
     # don't bother, the element is no more
     return nil unless element
 
-    if not (["text", "password"].include?(element["type"] || "text")) and element.name != "textarea"
-      # cannot type if the element is not a text field, password field or textarea
-      raise Futile::SearchIsFutile.new("Cannot type into '%s'" % [element])
-    end
     if element["disabled"] or element["readonly"]
       # cannot type into disabled/readonly field
       raise Futile::SearchIsFutile.new("Element '%s' is disabled/readonly" % [element])
     end
     element
-  end
-
-  def params_to_string
-    params.map { |k, v| "%s=%s" % [k, v] }.sort.join("&")
   end
 end

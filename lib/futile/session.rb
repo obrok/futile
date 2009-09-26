@@ -4,7 +4,7 @@
 class Futile::Session
   include Futile::Helpers
 
-  attr_reader :response, :params
+  attr_reader :response
 
   ##
   # Initialize with url/port of the tested page.
@@ -28,6 +28,8 @@ class Futile::Session
   # Performs a simple get on base url.
   # Please mind that the uri *must* begin with a slash ('/'), otherwise the
   # request will be invalid.
+  #
+  #  app.get("/site")
   #
   # @param [String] uri relative path to request
   # @param [Hash] opts additional options:
@@ -112,22 +114,69 @@ class Futile::Session
   #  fill("value", "Michal") # => <input name="param" value="Michal"/>
   #
   # @param [String] locator label's inner html or xpath/css locator
+  # @param [String] what the text to type into field
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
   #         elements found or element is not suitable for typing
   # @return [String] the text filled
   def fill(locator, what)
     element = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless element
-    params[element["name"]] = what
+    if not (["text", "password"].include?(element["type"] || "text")) and element.name != "textarea"
+      # cannot type if the element is not a text field, password field or textarea
+      raise Futile::SearchIsFutile.new("Cannot type into '%s'" % [element])
+    end
+    if element.name == "input"
+      element["value"] = what
+    else
+      element.inner_html = what
+    end
   end
 
-  def select(from, what)
+  def select(locator, what)
   end
 
-  def check(what)
+  ##
+  # Use this method to check a checkbox input specified by _locator_.
+  #
+  #
+  #  # => <input type="checkbox" name="foo" value="on">
+  #  session.check("foo") # => <input type="checkbox" name="foo" value="on" checked>
+  #
+  # @param [String] locator label/name of checkbox
+  # @raise [Futile::SearchIsFutile] raised when element not found
+  # @raise [Futile::CheckIsFutile] raised when checkbox is already checked
+  def check(locator)
+    checkbox = find_input(locator)
+    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
+    if checkbox.name != "input" or checkbox["type"] != "checkbox"
+      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
+    end
+    if checkbox["checked"]
+      raise Futile::CheckIsFutile.new("Element '%s' already checked" % [checkbox])
+    end
+    checkbox["checked"] = "checked"
   end
 
-  def uncheck(what)
+  ##
+  # Use this method to uncheck a checkbox input specified by _locator_.
+  #
+  #
+  #  # => <input type="checkbox" name="foo" value="on" checked>
+  #  session.uncheck("foo") # => <input type="checkbox" name="foo" value="on">
+  #
+  # @param [String] locator label/name of checkbox
+  # @raise [Futile::SearchIsFutile] raised when element not found
+  # @raise [Futile::CheckIsFutile] raised when checkbox is not checked
+  def uncheck(locator)
+    checkbox = find_input(locator)
+    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
+    if checkbox.name != "input" or checkbox["type"] != "checkbox"
+      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
+    end
+    unless checkbox["checked"]
+      raise Futile::CheckIsFutile.new("Element '%s' already unchecked" % [checkbox])
+    end
+    checkbox.remove_attribute("checked")
   end
 
   private
@@ -148,6 +197,5 @@ class Futile::Session
   def reset_state
     @no_redirects = 0
     @uri = nil
-    @params = {}
   end
 end

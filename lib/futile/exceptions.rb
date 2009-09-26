@@ -14,3 +14,8 @@ end
 # * more than one elements were found
 class Futile::SearchIsFutile < Futile::ResistanceIsFutile
 end
+
+##
+# Raised when trying to (un)check already (un)checked element
+class Futile::CheckIsFutile < Futile::ResistanceIsFutile
+end
