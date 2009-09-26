@@ -45,6 +45,10 @@ module TestServer
     resp.body = parse_erb("form.erb")
   end
 
+  SERVER.mount_proc("/doit") do |req, resp|
+    resp.body = req.request_method
+  end
+
   Thread.fork do
     SERVER.start
   end
