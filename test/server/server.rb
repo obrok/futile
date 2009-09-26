@@ -10,16 +10,17 @@ module TestServer
     erb.result(binding)
   end
 
-  SERVER = HTTPServer.new(:Port => 6666, 
-                          :Logger => Log.new(nil, BasicLog::WARN),
-                          :AccessLog => [])
+  SERVER = HTTPServer.new({:Port => 6666,
+                           :Logger => Log.new(nil, BasicLog::WARN),
+                           :AccessLog => [],
+                          })
 
   ["INT", "TERM"].each { |signal|
     trap(signal) { SERVER.shutdown }
   }
 
   SERVER.mount_proc("/simple_get") do |req, resp|
-    resp.body = "get response"
+    resp.body = parse_erb("simple_html.erb")
   end
 
   SERVER.mount_proc("/infinite_redirect") do |req, resp|
@@ -34,11 +35,6 @@ module TestServer
 
   def self.content=(value)
     @@content = value
-  end
-
-  SERVER.mount_proc("/") do |req, resp|
-    resp.body = @@content
-    resp.status = 200
   end
 
   SERVER.mount_proc("/form") do |req, resp|
