@@ -71,4 +71,10 @@ class HelpersTest < Futile::TestCase
       assert_equal("<a href=\"/second_page\">link q9</a>", @futile.find_link(locator).to_s)
     end
   end
+
+  def test_click_anchored_link_should_only_change_path
+    @futile.get("/simple_get")
+    @futile.click_link("anchor!!!1")
+    assert_equal "/simple_get#only_anchor", @futile.path
+  end
 end

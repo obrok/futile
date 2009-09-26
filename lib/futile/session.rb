@@ -25,7 +25,12 @@ class Futile::Session
   def click_link(locator)
     link = find_link(locator)
     raise Futile::SearchIsFutile.new("Could not find '%s'" % locator) unless link
-    get(link['href'])
+    href = link['href']
+    if href =~ /^#/
+      @uri = @uri.split("#")[0] + href
+    else
+      get(link['href'])
+    end
   end
 
   def path
