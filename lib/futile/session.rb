@@ -9,16 +9,21 @@ class Futile::Session
   ##
   # Initialize with url/port of the tested page.
   #
-  #  app = Futile::Session.new("localhost", 3000)
+  #  app = Futile::Session.new("localhost:3000")
   # would test your Rails application
   #
-  #  app = Futile::Session.new("www.google.com", 80, {:max_redirects => 100})
+  #  app = Futile::Session.new("www.google.com", {:max_redirects => 100})
   # Set the number of redirects considered to be an infinite redirect.
   #
-  # @param [String] url the web page address to test
-  # @param [Integer] port port to connect to
+  # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
-  def initialize(url, port, opts = {})
+  def initialize(path, opts = {})
+    if path.is_a?(URI)
+      url, port = path.host, path.port
+    else
+      url, port = path.split(":")
+      port ||= 80
+    end
     @session = Net::HTTP.start(url, port)
     @max_redirects = opts[:max_redirects] || 10
     reset_state
@@ -120,7 +125,6 @@ class Futile::Session
   ##
   # Use this method to check a checkbox input specified by _locator_.
   #
-  #
   #  # => <input type="checkbox" name="foo" value="on">
   #  session.check("foo") # => <input type="checkbox" name="foo" value="on" checked>
   #
@@ -141,7 +145,6 @@ class Futile::Session
 
   ##
   # Use this method to uncheck a checkbox input specified by _locator_.
-  #
   #
   #  # => <input type="checkbox" name="foo" value="on" checked>
   #  session.uncheck("foo") # => <input type="checkbox" name="foo" value="on">
