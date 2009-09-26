@@ -9,6 +9,7 @@ module Futile::Helpers
     if label
       # if the label was found locate element it was labeling
       element = response.parsed_body.at("//input[@id='%s']" % [label["for"]])
+      element ||= response.parsed_body.at("//textarea[@id='%s']" % [label["for"]])
     else
       # else try to find element by name
       element = response.parsed_body.at("//input[@name='%s']" % [where])

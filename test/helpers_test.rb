@@ -58,4 +58,10 @@ class HelpersTest < Futile::TestCase
       @futile.fill("p7", "uhoh")
     end
   end
+
+  def test_type_into_textarea_by_label
+    @futile.get("/form")
+    @futile.fill("Body", "new textarea body")
+    assert_equal "new textarea body", @futile.params["p5"]
+  end
 end
