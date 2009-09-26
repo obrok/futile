@@ -18,12 +18,7 @@ class Futile::Session
   # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
   def initialize(path, opts = {})
-    if path.is_a?(URI)
-      url, port = path.host, path.port
-    else
-      url, port = path.split(":")
-      port ||= 80
-    end
+    url, port = extract_from_url(path)
     @session = Net::HTTP.start(url, port)
     @max_redirects = opts[:max_redirects] || 10
     reset_state
@@ -31,10 +26,12 @@ class Futile::Session
 
   ##
   # Performs a simple get on base url.
-  # Please mind that the uri *must* begin with a slash ('/'), otherwise the
+  # Please mind that the relative uri *must* begin with a slash ('/'), otherwise the
   # request will be invalid.
   #
   #  app.get("/site")
+  #
+  # You can pass absolute uri.
   #
   # @param [String] uri relative path to request
   # @param [Hash] opts additional options:
@@ -43,6 +40,12 @@ class Futile::Session
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
   def get(uri, opts = {})
     reset_state
+    if uri !~ /^\//
+      # absolute uri
+      @session.disconnect
+      url, port = extract_from_url(uri)
+      @session = Net::HTTP.start(url, port)
+    end
     @uri = uri
     result = opts[:method] == 'post' ? session.post(@uri, {}) : session.get(@uri)
     @response = Futile::Response.new(result)
@@ -200,5 +203,15 @@ class Futile::Session
   def reset_state
     @no_redirects = 0
     @uri = nil
+  end
+
+  def extract_from_url(path)
+    if path.is_a?(URI)
+      url, port = path.host, path.port
+    else
+      url, port = path.split(":")
+      port ||= 80
+    end
+    [url, port]
   end
 end
