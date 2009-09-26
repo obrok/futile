@@ -2,8 +2,16 @@
   <body>
     <form action="/doit">
       <input type="text" name="p1" value="init value"/>
-      <input type="text" name="p2"/>
+      <label for="id1">The label</label>
+      <input id="id1" type="text" name="p2"/>
+      <input id ="id2" name="p3"/>
+      <input id="id3" type="checkbox" name="p4"/>
       <input type="submit" value="Send me"/>
+      <label for="id2">Not unique</label>
+      <label for="id3">Not unique</label>
+      <textarea name="p5">Initial value</textarea>
+      <input type="password" name="p6"/>
+      <input disabled name="p7"/>
     </form>
   </body>
 </html>
