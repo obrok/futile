@@ -109,4 +109,10 @@ class SessionTest < Futile::TestCase
     @futile.check("p4")
     assert_equal "on", @futile.response.parsed_body.at("#id3")["value"]
   end
+
+  def test_anchored_link_elswhere
+    @futile.get("/simple_get")
+    @futile.click_link("anchor elsewhere")
+    assert_match("This is the second page", @futile.response.body)
+  end
 end

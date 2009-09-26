@@ -65,7 +65,7 @@ class Futile::Session
       @uri = @uri.split("#")[0] + href
       response
     else
-      get(link['href'])
+      get(href)
     end
   end
 
