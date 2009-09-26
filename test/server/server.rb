@@ -23,6 +23,10 @@ module TestServer
     resp.body = parse_erb("simple_html.erb")
   end
 
+  SERVER.mount_proc("/second_page") do |req, resp|
+    resp.body = parse_erb("second_page.erb")
+  end
+
   SERVER.mount_proc("/infinite_redirect") do |req, resp|
     resp["Location"] = "/infinite_redirect"
     resp.status = 302

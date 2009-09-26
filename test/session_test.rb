@@ -14,10 +14,16 @@ class SessionTest < Futile::TestCase
     assert @futile.redirected?
   end
 
-  ["link q9", '//a', 'html > body > a'].each_with_index do |locator, index|
-    define_method "test_find_link(#{locator})".to_sym do
-      @futile.get('/simple_get')
-      assert_equal("<a href=\"/some_page\">link q9</a>", @futile.find_link(locator))
+  def test_click_link
+    @futile.get('/simple_get')
+    @futile.click_link("link q9")
+    assert_match(/This is the second page/, @futile.response.body)
+  end
+
+  def test_click_nonexistent_link
+    @futile.get('/simple_get')
+    assert_raise(Futile::SearchIsFutile) do
+      @futile.click_link("No such link")
     end
   end
 end
