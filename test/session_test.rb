@@ -121,4 +121,10 @@ class SessionTest < Futile::TestCase
       @futile.check("p8")
     end
   end
+
+  def test_unchecking_checkbox
+    @futile.get("/form")
+    @futile.uncheck("p8")
+    assert_nil @futile.response.parsed_body.at("#id6")["checked"]
+  end
 end

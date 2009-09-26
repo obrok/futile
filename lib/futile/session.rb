@@ -130,6 +130,15 @@ class Futile::Session
   end
 
   def uncheck(locator)
+    checkbox = find_input(locator)
+    raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
+    if checkbox.name != "input" or checkbox["type"] != "checkbox"
+      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
+    end
+    unless checkbox["checked"]
+      raise Futile::CheckIsFutile.new("Element '%s' already unchecked" % [checkbox])
+    end
+    checkbox.remove_attribute("checked")
   end
 
   private
