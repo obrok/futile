@@ -17,7 +17,7 @@ module Futile::Helpers
   def find_link(locator)
     #First try to treat it as a CSS or XPath locator
     element = response.parsed_body.at(locator)
-    #If that doesn't work search for an a tag matching the specified text
+    #If that doesn't work search for a tag matching the specified text
     response.parsed_body.xpath('//a').each do |el|
       return el.to_s if el.to_s.include?(locator)
     end unless element
