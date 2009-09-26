@@ -102,4 +102,11 @@ class SessionTest < Futile::TestCase
     response = @futile.click_link("anchor!!!1")
     assert response.is_a?(Futile::Response)
   end
+
+  def test_checking_checkbox
+    # <input id="id3" type="checkbox" name="p4"/>
+    @futile.get("/form")
+    @futile.check("p4")
+    assert_equal "on", @futile.params["p4"]
+  end
 end
