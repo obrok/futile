@@ -38,3 +38,12 @@ end
 
 desc 'Default: run tests'
 task :default => 'test'
+
+desc "Clean files which can be generated"
+task :clean do
+  FileUtils.rm_rf("pkg")
+  FileUtils.rm_rf("doc")
+end
+
+desc "Run tests, generate doc and build gem"
+task :release => [:clean, :test, :yardoc, :gem]
