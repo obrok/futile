@@ -1,1 +1,48 @@
-Futile aims to be a cross-platform, cross-framework functional testing package.
+= What is Futile?
+Futile aims to be a cross-platform, cross-framework, robust and lightweight
+functional testing package for web pages.
+
+And yes, we _deliberately_ used those buzzwords.
+
+= Why should I use it?
+For a hypothetical users of your website the most important thing is that it
+works. They don't care wether your #authorize method returns instance of user or
+an integer. They don't give a damn about it! They want to see the page, type in
+their login/password and see their profile. That's it. Easy as it sounds.
+
+= Installation
+ $ sudo gem install futile
+
+= Usage
+We provide you with a tool that will help you test your site from a view of
+enduser. You will be able to click buttons, type fields and do thing a regular
+user would do on your site.
+
+== Show me some examples
+Let's say we want to test google. We want to be sure that the search results are
+ok, that the page is shown and such.
+
+ require "rubygems"
+ require "futile"
+
+ g = Futile::Session.new("www.google.com")
+ g.get("/")               # (1)
+ g.fill("q", "google")    # (2)
+ g.click_button("Search") # (3)
+
+== What happens here?
+* (1) will make sure your response was valid (not a 5xx)
+* (2) takes care to check that "q"-named input exists
+* (3) checks that submit field "Search" is present and sends the form
+  associated with it (including your newly _typed_ values)
+
+= JavaScript
+No. This tool supports *only* html, no browser (as Firefox or Safari) is
+available so you are not able to test JS.
+
+= Authors
+Futile is developed by
+* Michal Bugno
+* Pawel Obrok
+
+If you would like to contribute feel free to contact us.
