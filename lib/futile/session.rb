@@ -36,18 +36,18 @@ class Futile::Session
   end
 
   # Performs a request on _uri_
-  # Please mind that the relative uri *must* begin with a slash ('/'), otherwise the
-  # request will be invalid.
+  # Please keep in mind that the relative uri *must* begin with a slash ('/'), otherwise 
+  # the request will be invalid.
   #
   #  app.get("/site")
   #
-  # You can pass absolute uri.
+  # You can pass an absolute uri.
   #
   # @param [String] uri relative path to request
   # @param [String] method request method
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
-  def request(uri, method)
+  def request(uri, method, data = {})
     reset_state
     if uri !~ /^\//
       # absolute uri
@@ -61,7 +61,7 @@ class Futile::Session
              when GET
                session.get(@uri)
              when POST
-               session.post(@uri, {})
+               session.post(@uri, hash_to_params(data))
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end
@@ -109,7 +109,8 @@ class Futile::Session
   #        could not be found
   def click_button(locator)
     form = find_form(locator)
-    request(form['action'], form['method'] || POST)
+    data = build_params(form)
+    request(form['action'], form['method'] || POST, data)
   end
 
   ##
@@ -230,5 +231,21 @@ class Futile::Session
       port ||= 80
     end
     [url, port]
+  end
+
+  def build_params(form)
+    data = {}
+    form.xpath('.//input').each do |input|
+      data[input[:name]] = input[:value] || ""
+    end
+    data
+  end
+
+  def hash_to_params(data)
+    params = []
+    data.each do |k,v|
+      params << "#{k}=#{v}"
+    end
+    params.join('&')
   end
 end

@@ -113,7 +113,7 @@ class SessionTest < Futile::TestCase
     define_method "test_form_submission_#{pair[0]}_#{pair[1]}" do
       @futile.get("/form")
       @futile.click_button("#{pair[0]} #{pair[1]}")
-      assert_equal(pair[1].to_s.upcase, @futile.response.body)
+      assert_match(/#{pair[1].to_s.upcase}/, @futile.response.body)
     end
   end
 
@@ -134,5 +134,11 @@ class SessionTest < Futile::TestCase
     @futile.get("/form")
     @futile.uncheck("p8")
     assert_nil @futile.response.parsed_body.at("#id6")["checked"]
+  end
+
+  def test_submit_input
+    @futile.get("/form")
+    @futile.click_button("submit post")
+    assert_match(/p1:init value/, @futile.response.body)
   end
 end
