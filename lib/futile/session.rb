@@ -235,8 +235,13 @@ class Futile::Session
 
   def build_params(form)
     data = {}
-    form.xpath('.//input').each do |input|
-      data[input[:name]] = input[:value] || ""
+    form.xpath('.//input|.//textarea').each do |input|
+      case input.name
+      when 'input'
+        data[input[:name]] = input[:value] || ""
+      when 'textarea'
+        data[input[:name]] = input.inner_html
+      end
     end
     data
   end
