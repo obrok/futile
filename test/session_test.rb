@@ -136,9 +136,11 @@ class SessionTest < Futile::TestCase
     assert_nil @futile.response.parsed_body.at("#id6")["checked"]
   end
 
-  def test_submit_input
-    @futile.get("/form")
-    @futile.click_button("submit post")
-    assert_match(/p1:init value/, @futile.response.body)
+  [/p1:init value/, /p9:a&b/].each do |regex|
+    define_method("test_submit_#{regex}") do
+      @futile.get("/form")
+      @futile.click_button("submit post")
+      assert_match(regex, @futile.response.body)
+    end
   end
 end

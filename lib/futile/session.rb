@@ -244,7 +244,7 @@ class Futile::Session
   def hash_to_params(data)
     params = []
     data.each do |k,v|
-      params << "#{k}=#{v}"
+      params << "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"
     end
     params.join('&')
   end

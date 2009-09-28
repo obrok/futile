@@ -1,6 +1,7 @@
 require "rubygems"
 require "nokogiri"
 require "net/http"
+require "cgi"
 
 module Futile
 end
