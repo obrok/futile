@@ -1,6 +1,6 @@
 <html>
   <body>
-    <form action="/doit">
+    <form action="/doit" method="post">
       <input id="id0" type="text" name="p1" value="init value"/>
       <label for="id1">The label</label>
       <input id="id1" type="text" name="p2"/>
@@ -15,12 +15,12 @@
       <input disabled name="p7"/>
       <input id="id6" type="checkbox" checked name="p8"/>
       <input id="id7" type="text" name="p9" value="a&b"/>
-      <submit>submit post</submit>
+      <input type="submit" value="submit post"/>
       <button>button post</button>
     </form>
     <form action="/doit" method="get">
       <div>
-        <submit>submit get</submit>
+        <input type="submit" value="submit get"/>
         <button>button get</button>
       </div>
     </form>

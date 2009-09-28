@@ -1,7 +1,7 @@
 module Futile::Helpers
   private
   def find_form(button_locator)
-    button = find_element(button_locator, :button) || find_element(button_locator, :submit)
+    button = find_element(button_locator, :button) || find_element(button_locator, :input, :type => 'submit')
     find_parent(button, 'form')
   end
 
@@ -9,18 +9,26 @@ module Futile::Helpers
     find_element(locator, :a)
   end
 
-  def find_parent(element, type)
+  def find_parent(element, name)
     parent = element.parent
-    parent = parent.parent while parent.name != type
+    parent = parent.parent while parent.name != name
     parent
   end
 
-  def find_element(locator, type)
-    response.parsed_body.xpath("//#{type}").each do |el|
+  def find_element(locator, name, opts={})  
+    response.parsed_body.xpath(xpath_expression(name, opts)).each do |el|
       return el if el.to_s.include?(locator)
     end
     element = response.parsed_body.at(locator) rescue nil
     element
+  end
+
+  def xpath_expression(name, opts)
+    conditions = []
+    opts.each do |k,v|
+      conditions << "@#{k} = '#{v}'"
+    end
+    conditions.empty? ? "//#{name}" : "//#{name}[#{conditions.join(' and ')}]"
   end
 
   def find_input(locator)
