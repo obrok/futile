@@ -237,10 +237,11 @@ class Futile::Session
   def build_params(form, button)
     data = {}
     form.xpath('.//input|.//textarea').each do |input|
-      case input.name
-      when 'input'
-        data[input[:name]] = input[:value] || ""
-      when 'textarea'
+      if input.name == 'input' && input[:type] == 'checkbox'
+        data[input[:name]] = 'on' if input[:checked]
+      elsif input.name == 'input'
+        data[input[:name]] = input[:value] || ''
+      elsif input.name = 'textarea'
         data[input[:name]] = input.inner_html
       end unless input[:disabled] || input[:type] == 'submit'
     end
