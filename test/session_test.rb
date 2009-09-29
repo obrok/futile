@@ -143,4 +143,12 @@ class SessionTest < Futile::TestCase
       assert_match(regex, @futile.response.body)
     end
   end
+
+  [/p7:disabled/].each do |regex|
+    define_method("test_submit_#{regex}") do
+      @futile.get("/form")
+      @futile.click_button("submit post")
+      assert_no_match(regex, @futile.response.body)
+    end
+  end
 end

@@ -241,7 +241,7 @@ class Futile::Session
         data[input[:name]] = input[:value] || ""
       when 'textarea'
         data[input[:name]] = input.inner_html
-      end
+      end unless input[:disabled]
     end
     data
   end
