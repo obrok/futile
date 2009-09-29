@@ -1,10 +1,5 @@
 module Futile::Helpers
   private
-  def find_form(button_locator)
-    button = find_element(button_locator, :button) || find_element(button_locator, :input, :type => 'submit')
-    find_parent(button, 'form')
-  end
-
   def find_link(locator)
     find_element(locator, :a)
   end

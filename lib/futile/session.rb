@@ -108,8 +108,9 @@ class Futile::Session
   # @raise [Futile::SearchIsFutile] raised when the button specified by _locator_
   #        could not be found
   def click_button(locator)
-    form = find_form(locator)
-    data = build_params(form)
+    button = find_element(locator, :button) || find_element(locator, :input, :type => 'submit')
+    form = find_parent(button, 'form')
+    data = build_params(form, button)
     request(form['action'], form['method'] || POST, data)
   end
 
@@ -233,7 +234,7 @@ class Futile::Session
     [url, port]
   end
 
-  def build_params(form)
+  def build_params(form, button)
     data = {}
     form.xpath('.//input|.//textarea').each do |input|
       case input.name
@@ -241,9 +242,9 @@ class Futile::Session
         data[input[:name]] = input[:value] || ""
       when 'textarea'
         data[input[:name]] = input.inner_html
-      end unless input[:disabled]
+      end unless input[:disabled] || input[:type] == 'submit'
     end
-    data
+    data.merge(button[:name] => button[:value])
   end
 
   def hash_to_params(data)

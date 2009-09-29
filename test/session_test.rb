@@ -136,18 +136,24 @@ class SessionTest < Futile::TestCase
     assert_nil @futile.response.parsed_body.at("#id6")["checked"]
   end
 
-  [/p1:init value/, /p9:a&b/, /p5:Initial value/].each do |regex|
-    define_method("test_submit_#{regex}") do
+  [/p1:init value/, /p9:a&b/, /p5:Initial value/, /button:submit post/].each do |regex|
+    define_method("test_submit_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
       @futile.click_button("submit post")
       assert_match(regex, @futile.response.body)
     end
   end
 
-  [/p7:disabled/].each do |regex|
-    define_method("test_submit_#{regex}") do
+  def test_submit_button_value
+    @futile.get("/form")
+    @futile.click_button("button post")
+    assert_match(/button:button post/, @futile.response.body)
+  end
+
+  [/p7:disabled/, /button:submit post/].each do |regex|
+    define_method("test_submit_not_sent_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
-      @futile.click_button("submit post")
+      @futile.click_button("button post")
       assert_no_match(regex, @futile.response.body)
     end
   end
