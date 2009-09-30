@@ -1,0 +1,2 @@
+ * unify @uri in session (URI class)
+ * Futile::Response#body should use #parsed_body (for consistency)
