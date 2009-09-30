@@ -137,7 +137,7 @@ class SessionTest < Futile::TestCase
   end
 
   [/p1:init value/, /p9:a&b/, /p5:Initial value/, /button:submit post/,
-   /p8:on/, /p10:radio value 2/, /p12:on/].each do |regex|
+   /p8:on/, /p10:radio value 2/, /p12:on/, /p13:selected/].each do |regex|
     define_method("test_submit_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
       @futile.click_button("submit post")
@@ -152,7 +152,7 @@ class SessionTest < Futile::TestCase
   end
 
   [/p7:disabled/, /button:submit post/, /p4:/, /p10:radio value1/,
-   /p11/].each do |regex|
+   /p11/, /p13:not selected/].each do |regex|
     define_method("test_submit_not_sent_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
       @futile.click_button("button post")

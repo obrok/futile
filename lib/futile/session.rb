@@ -236,15 +236,17 @@ class Futile::Session
 
   def build_params(form, button)
     data = {}
-    form.xpath('.//input|.//textarea').each do |input|
+    form.xpath('.//input|.//textarea|.//select').each do |input|
       if input.name == 'input' && input[:type] == 'checkbox'
         data[input[:name]] = 'on' if input[:checked]
       elsif input.name == 'input' && input[:type] == 'radio'
         data[input[:name]] = input[:value] || 'on' if input[:checked]
       elsif input.name == 'input'
         data[input[:name]] = input[:value] || ''
-      elsif input.name = 'textarea'
+      elsif input.name == 'textarea'
         data[input[:name]] = input.inner_html
+      elsif input.name == 'select'
+        data[input[:name]] = input.xpath('.//option[@selected]').first[:value] || ""
       end unless input[:disabled] || input[:type] == 'submit'
     end
     data.merge(button[:name] => button[:value])
