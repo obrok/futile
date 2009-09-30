@@ -239,6 +239,8 @@ class Futile::Session
     form.xpath('.//input|.//textarea').each do |input|
       if input.name == 'input' && input[:type] == 'checkbox'
         data[input[:name]] = 'on' if input[:checked]
+      elsif input.name == 'input' && input[:type] == 'radio'
+        data[input[:name]] = input[:value] || 'on' if input[:checked]
       elsif input.name == 'input'
         data[input[:name]] = input[:value] || ''
       elsif input.name = 'textarea'
