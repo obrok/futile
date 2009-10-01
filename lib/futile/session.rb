@@ -257,12 +257,8 @@ class Futile::Session
 
   def hash_to_params(data)
     params = []
-    data.each do |k,v|
-      if v.kind_of?(Array)
-        v.each {|element| params << "#{CGI.escape(k.to_s)}=#{CGI.escape(element.to_s)}"}
-      else
-        params << "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"
-      end
+    [*data].each do |k,v|
+      v.each {|element| params << "#{CGI.escape(k.to_s)}=#{CGI.escape(element.to_s)}"}
     end
     params.join('&')
   end
