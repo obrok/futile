@@ -160,4 +160,14 @@ class SessionTest < Futile::TestCase
       assert_no_match(regex, @futile.response.body)
     end
   end
+
+  def test_click_button_with_no_form
+    @futile.get("/form")
+    assert_raises(Futile::ButtonIsFutile){@futile.click_button("random button")}
+  end
+
+  def test_click_nonexistent_button
+    @futile.get("/form")
+    assert_raises(Futile::SearchIsFutile){@futile.click_button("no such button")}
+  end
 end

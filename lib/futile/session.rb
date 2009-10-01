@@ -87,7 +87,7 @@ class Futile::Session
   #        could not be found
   def click_link(locator)
     link = find_link(locator)
-    raise Futile::SearchIsFutile.new("Could not find '%s'" % locator) unless link
+    raise Futile::SearchIsFutile.new("Could not find '%s' link" % locator) unless link
     href = link['href']
     if href =~ /^#/
       @uri = @uri.split("#")[0] + href
@@ -109,9 +109,12 @@ class Futile::Session
   #        could not be found
   def click_button(locator)
     button = find_element(locator, :button) || find_element(locator, :input, :type => 'submit')
+    raise Futile::SearchIsFutile.new("Could not find \"#{locator}\" button") unless button
     form = find_parent(button, 'form')
     data = build_params(form, button)
     request(form['action'], form['method'] || POST, data)
+  rescue NoMethodError
+    raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form")
   end
 
   ##
