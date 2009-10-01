@@ -1,8 +1,8 @@
 class Futile::Response
-  attr_reader :body, :content_type, :status, :response, :headers
+  attr_reader :parsed_body, :content_type, :status, :response, :headers
 
   def initialize(response)
-    @body = response.body
+    @parsed_body = Nokogiri.parse(response.body)
     @content_type = response.content_type
     @status = response.code.to_i
     @headers = response.each_header { |_, _| }
@@ -15,8 +15,11 @@ class Futile::Response
   end
 
   ##
-  # @return [Nokogiri] response body parsed with Nokogiri
-  def parsed_body
-    @parsed_body ||= Nokogiri.parse(@body)
+  # This method returns actual body of the page. Note that this might be
+  # afftected by methods which type/select/check elements.
+  #
+  # @return [String] body of response
+  def body
+    parsed_body.to_s
   end
 end

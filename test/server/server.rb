@@ -46,12 +46,13 @@ module TestServer
   end
 
   SERVER.mount_proc("/doit") do |req, resp|
-    resp.body = req.request_method
+    resp.body = "<html><body>" + req.request_method
     req.query.each do |k, v|
       v.each_data do |d|
         resp.body += "\n#{k}:#{d}"
       end
     end
+    resp.body += "</body></html>"
   end
 
   Thread.fork do

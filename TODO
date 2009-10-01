@@ -1,2 +1,3 @@
  * unify @uri in session (URI class)
- * Futile::Response#body should use #parsed_body (for consistency)
+ * handling a reset button - this seems like a nightmare 
+   with our chosen way of updating form data
