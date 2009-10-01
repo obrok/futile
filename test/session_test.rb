@@ -146,12 +146,6 @@ class SessionTest < Futile::TestCase
     end
   end
 
-  def test_ampersand_gets_escaped
-    @futile.get("/form")
-    @futile.click_button("submit post")
-    assert_match("a&amp;b", @futile.response.body)
-  end
-
   def test_submit_button_value
     @futile.get("/form")
     @futile.click_button("button post")
