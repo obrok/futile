@@ -137,18 +137,12 @@ class SessionTest < Futile::TestCase
   end
 
   [/p1:init value/, /p5:Initial value/, /button:submit post/,
-   /p8:on/, /p10:radio value 2/, /p12:on/, /p13:selected/].each do |regex|
+   /p8:on/, /p9:a&b/, /p10:radio value 2/, /p12:on/, /p13:selected/].each do |regex|
     define_method("test_submit_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
       @futile.click_button("submit post")
       assert_match(regex, @futile.response.body)
     end
-  end
-
-  def test_ampersand_gets_escaped
-    @futile.get("/form")
-    @futile.click_button("submit post")
-    assert_match("a&amp;b", @futile.response.body)
   end
 
   def test_submit_button_value

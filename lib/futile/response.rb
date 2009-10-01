@@ -1,8 +1,8 @@
 class Futile::Response
-  attr_reader :parsed_body, :content_type, :status, :response, :headers
+  attr_reader :content_type, :status, :response, :headers
 
   def initialize(response)
-    @parsed_body = Nokogiri.parse(response.body)
+    @_body = response.body
     @content_type = response.content_type
     @status = response.code.to_i
     @headers = response.each_header { |_, _| }
@@ -20,6 +20,18 @@ class Futile::Response
   #
   # @return [String] body of response
   def body
-    parsed_body.to_s
+    @_body || parsed_body.to_s
+  end
+
+  ##
+  # Parsed body by Nokogiri.
+  #
+  # @return [Nokogiri] Nokogiri--parsed body.
+  def parsed_body
+    unless @parsed_body
+      @parsed_body = Nokogiri.parse(@_body)
+      @_body = nil
+    end
+    @parsed_body
   end
 end
