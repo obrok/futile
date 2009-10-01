@@ -246,7 +246,7 @@ class Futile::Session
       elsif input.name == 'textarea'
         data[input[:name]] = input.inner_html
       elsif input.name == 'select'
-        data[input[:name]] = input.xpath('.//option[@selected]').first[:value] || ""
+        data[input[:name]] = input.xpath('.//option[@selected]').map{|x| x[:value] || ""}
       end unless input[:disabled] || input[:type] == 'submit'
     end
     data.merge(button[:name] => button[:value])
@@ -255,7 +255,11 @@ class Futile::Session
   def hash_to_params(data)
     params = []
     data.each do |k,v|
-      params << "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"
+      if v.kind_of?(Array)
+        v.each {|element| params << "#{CGI.escape(k.to_s)}=#{CGI.escape(element.to_s)}"}
+      else
+        params << "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"
+      end
     end
     params.join('&')
   end

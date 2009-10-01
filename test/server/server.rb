@@ -48,7 +48,9 @@ module TestServer
   SERVER.mount_proc("/doit") do |req, resp|
     resp.body = req.request_method
     req.query.each do |k, v|
-      resp.body += "\n#{k}:#{v}"
+      v.each_data do |d|
+        resp.body += "\n#{k}:#{d}"
+      end
     end
   end
 
