@@ -36,7 +36,7 @@ class Futile::Session
   end
 
   # Performs a request on _uri_
-  # Please keep in mind that the relative uri *must* begin with a slash ('/'), otherwise 
+  # Please keep in mind that the relative uri *must* begin with a slash ('/'), otherwise
   # the request will be invalid.
   #
   #  app.get("/site")
@@ -99,7 +99,7 @@ class Futile::Session
 
   ##
   # Clicks button (HTML tag <submit> or <button>) specified by _locator_. This means
-  # that a request to path found in the containing form's _href_ attribute is
+  # that a request to path found in the containing form's _action_ attribute is
   # performed with the appropriate method
   #
   # @param [String] locator locator to specify a button. This can be either the
@@ -107,6 +107,8 @@ class Futile::Session
   # @return [Futile::Response] response to the request
   # @raise [Futile::SearchIsFutile] raised when the button specified by _locator_
   #        could not be found
+  # @raise [Futile::ButtonIsFutile] raised when the button specified by
+  #        _locator_ is not inside a <form>
   def click_button(locator)
     button = find_element(locator, :button) || find_element(locator, :input, :type => 'submit')
     raise Futile::SearchIsFutile.new("Could not find \"#{locator}\" button") unless button
