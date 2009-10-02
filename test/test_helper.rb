@@ -5,7 +5,7 @@ require File.join("test", "server", "server")
 class Futile::TestCase < Test::Unit::TestCase
   def setup
     super
-    @futile = Futile::Session.new("localhost:6666")
+    @futile = Futile::Session.new("http://localhost:6666")
   end
 
   def teardown

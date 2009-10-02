@@ -170,4 +170,18 @@ class SessionTest < Futile::TestCase
     @futile.get("/form")
     assert_raises(Futile::SearchIsFutile){@futile.click_button("no such button")}
   end
+
+  def test_process_uri_builds_simple_uri
+    flunk
+  end
+
+  def test_process_uri_merges_relative_uri
+    flunk
+  end
+
+  def test_session_changed
+    session = @futile.send(:session)
+    @futile.get("http://0.0.0.0:6666/form")
+    assert session != @futile.send(:session)
+  end
 end

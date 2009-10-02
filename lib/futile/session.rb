@@ -20,8 +20,8 @@ class Futile::Session
   # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
   def initialize(path, opts = {})
-    url, port = extract_from_url(path)
-    @session = Net::HTTP.start(url, port)
+    @uri = process_uri(path)
+    @session = Net::HTTP.start(@uri.host, @uri.port)
     @max_redirects = opts[:max_redirects] || 10
     reset_state
   end
@@ -49,19 +49,17 @@ class Futile::Session
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
   def request(uri, method, data = {})
     reset_state
-    if uri !~ /^\//
-      # absolute uri
-      @session.disconnect
-      url, port = extract_from_url(uri)
-      @session = Net::HTTP.start(url, port)
+    @uri = process_uri(uri)
+    if session_changed?
+      disconnect
+      @session = Net::HTTP.start(@uri.host, @uri.port)
     end
-    @uri = uri
     method = method.upcase
     result = case method
              when GET
-               session.get(@uri)
+               session.get(path)
              when POST
-               session.post(@uri, hash_to_params(data))
+               session.post(path, hash_to_params(data))
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end
@@ -90,7 +88,7 @@ class Futile::Session
     raise Futile::SearchIsFutile.new("Could not find '%s' link" % locator) unless link
     href = link['href']
     if href =~ /^#/
-      @uri = @uri.split("#")[0] + href
+      @uri.fragment = href[1 .. -1]
       response
     else
       get(href)
@@ -124,7 +122,7 @@ class Futile::Session
   #
   # @return [String] current path (relative)
   def path
-    @uri
+    [@uri.path, @uri.fragment].compact.join("#")
   end
 
   ##
@@ -214,6 +212,10 @@ class Futile::Session
     @session
   end
 
+  def session_changed?
+    (@session.address != @uri.host) or (@session.port != @uri.port)
+  end
+
   def infinite_redirect?
     @no_redirects > @max_redirects
   end
@@ -226,17 +228,16 @@ class Futile::Session
 
   def reset_state
     @no_redirects = 0
-    @uri = nil
   end
 
-  def extract_from_url(path)
-    if path.is_a?(URI)
-      url, port = path.host, path.port
-    else
-      url, port = path.split(":")
-      port ||= 80
+  def process_uri(uri)
+    uri = URI.parse(uri.to_s)
+    unless uri.is_a?(URI::HTTP)
+      uri.host = @uri.host
+      uri.scheme = @uri.scheme
     end
-    [url, port]
+    uri.port = uri.port || @uri.port || 80
+    uri
   end
 
   def build_params(form, button)
