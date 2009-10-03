@@ -1,3 +1,2 @@
- * unify @uri in session (URI class)
  * handling a reset button - this seems like a nightmare 
    with our chosen way of updating form data

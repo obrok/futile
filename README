@@ -25,7 +25,7 @@ ok, that the page is shown and such.
  require "rubygems"
  require "futile"
 
- g = Futile::Session.new("www.google.com")
+ g = Futile::Session.new("http://www.google.com")
  g.get("/")               # (1)
  g.fill("q", "google")    # (2)
  g.click_button("Search") # (3)

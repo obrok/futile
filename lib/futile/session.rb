@@ -11,10 +11,10 @@ class Futile::Session
   ##
   # Initialize with url/port of the tested page.
   #
-  #  app = Futile::Session.new("localhost:3000")
+  #  app = Futile::Session.new("http://localhost:3000")
   # would test your Rails application
   #
-  #  app = Futile::Session.new("www.google.com", {:max_redirects => 100})
+  #  app = Futile::Session.new("http://www.google.com", {:max_redirects => 100})
   # Set the number of redirects considered to be an infinite redirect.
   #
   # @param [String, URI] path the web page address to test / uri object
@@ -118,11 +118,24 @@ class Futile::Session
   end
 
   ##
-  # Current path (i.e. the path which was yielded by last request)
+  # Current path (i.e. the path which was yielded by last request) together with
+  # anchor if there is one.
+  #
+  #  session.path # => "/my_page#new"
   #
   # @return [String] current path (relative)
   def path
     [@uri.path, @uri.fragment].compact.join("#")
+  end
+
+  ##
+  # Absolute path of current page.
+  #
+  #  session.full_path # => "http://google.pl/?q=goatse#no"
+  #
+  # @return [String] absolute path
+  def full_path
+    @uri.to_s
   end
 
   ##
@@ -232,11 +245,13 @@ class Futile::Session
 
   def process_uri(uri)
     uri = URI.parse(uri.to_s)
+    uri.port = uri.port || @uri.port || 80
     unless uri.is_a?(URI::HTTP)
       uri.host = @uri.host
       uri.scheme = @uri.scheme
+      # to be sure that we have an instance of URI::HTTP
+      uri = URI.parse(uri.to_s)
     end
-    uri.port = uri.port || @uri.port || 80
     uri
   end
 

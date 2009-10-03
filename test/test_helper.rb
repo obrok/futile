@@ -3,9 +3,11 @@ require File.join("lib", "futile")
 require File.join("test", "server", "server")
 
 class Futile::TestCase < Test::Unit::TestCase
+  TEST_SERVER_URI = "http://localhost:6666"
+
   def setup
     super
-    @futile = Futile::Session.new("http://localhost:6666")
+    @futile = Futile::Session.new(TEST_SERVER_URI)
   end
 
   def teardown
@@ -14,6 +16,10 @@ class Futile::TestCase < Test::Unit::TestCase
       @futile.disconnect
     rescue
     end
+  end
+
+  def assert_include(what, where)
+    assert where.include?(what), "%p doesn't include %p" % [where, what]
   end
 
   def test_default

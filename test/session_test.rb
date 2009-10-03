@@ -172,11 +172,19 @@ class SessionTest < Futile::TestCase
   end
 
   def test_process_uri_builds_simple_uri
-    flunk
+    uri = @futile.send(:process_uri, "/msq#test")
+    assert_include "msq#test", uri.to_s
   end
 
   def test_process_uri_merges_relative_uri
-    flunk
+    uri = @futile.send(:process_uri, "http://0.0.0.0:6666/doit")
+    assert_include "0.0.0.0:6666", uri.to_s
+  end
+
+  def test_process_uri_handles_params
+    path = "/?test=params&and_one=more"
+    uri = @futile.send(:process_uri, path)
+    assert_include path, uri.to_s
   end
 
   def test_session_changed
