@@ -208,4 +208,19 @@ class SessionTest < Futile::TestCase
     assert_match(/p14:selected/, @futile.response.body)
     assert_match(/p14:not selected/, @futile.response.body)
   end
+
+  def test_select_from_nonexistent
+    @futile.get("/form")
+    assert_raise(Futile::SearchIsFutile){@futile.select("there is no such select", "#this")}
+  end
+
+  def test_select_nonexistent_option
+    @futile.get("/form")
+    assert_raise(Futile::SearchIsFutile){@futile.select("p13", "there is no such option")}
+  end
+
+  def test_select_disabled_option
+    @futile.get("/form")
+    assert_raise(Futile::SelectIsFutile){@futile.select("p13", "#disabled")}
+  end
 end

@@ -184,15 +184,24 @@ class Futile::Session
   # @param [String] what the desired option's inner html or xpath/css locator
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
   #        elements found or the elemnt is not a select or an option
+  # @raise [Futile::SelectIsFutile] raised when trying to select a
+  #        disabled option
   # @return [Nokogiri::XML::Node] the element selected
   def select(locator, what)
     select = find_element(locator, 'select')
+    raise Futile::SearchIsFutile.new("Cannot find '#{locator}'") unless select
     select.xpath('.//option[@selected]').each do |opt|
       opt.delete('selected')
     end unless select['multiple']
     selected = find_element_in(what, 'option', select)
+    raise Futile::SearchIsFutile.new("Cannot find '#{what}' in #{select}") unless selected
+    raise Futile::SelectIsFutile.new("The option denoted by '#{what}' in #{select} is disabled") if selected['disabled']
     selected['selected'] = 'true'
     selected
+  end
+
+  # This will be needed for multiselects
+  def unselect
   end
 
   ##

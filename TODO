@@ -1,2 +1,3 @@
  * handling a reset button - this seems like a nightmare 
    with our chosen way of updating form data
+ * unselecting in multiselects

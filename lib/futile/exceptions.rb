@@ -24,3 +24,8 @@ end
 # Raised when clicking a button that is not in a form
 class Futile::ButtonIsFutile < Futile::ResistanceIsFutile
 end
+
+##
+# Raised when selecting a disabled option
+class Futile::SelectIsFutile < Futile::ResistanceIsFutile
+end
