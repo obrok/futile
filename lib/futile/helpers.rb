@@ -10,12 +10,16 @@ module Futile::Helpers
     parent
   end
 
-  def find_element(locator, name, opts={})  
-    response.parsed_body.xpath(xpath_expression(name, opts)).each do |el|
+  def find_element(locator, name, opts={})
+    find_element_in(locator, name, response.parsed_body, opts)
+  end
+
+  def find_element_in(locator, name, node, opts={})
+    node.xpath(xpath_expression(name, opts)).each do |el|
       return el if el.to_s.include?(locator)
     end
-    element = response.parsed_body.at(locator) rescue nil
-    element
+    element = node.at(locator) rescue nil
+    element    
   end
 
   def xpath_expression(name, opts)
@@ -23,7 +27,7 @@ module Futile::Helpers
     opts.each do |k,v|
       conditions << "@#{k} = '#{v}'"
     end
-    conditions.empty? ? "//#{name}" : "//#{name}[#{conditions.join(' and ')}]"
+    conditions.empty? ? ".//#{name}" : ".//#{name}[#{conditions.join(' and ')}]"
   end
 
   def find_input(locator)

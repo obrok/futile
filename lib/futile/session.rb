@@ -175,7 +175,24 @@ class Futile::Session
     end
   end
 
+  ##
+  # Selects an option from a select form element
+  #
+  #  select("#this", "#that") # => <option id="that" selected>Text</option>
+  #
+  # @param [String] locator select's inner html or xpath/css locator
+  # @param [String] what the desired option's inner html or xpath/css locator
+  # @raise [Futile::SearchIsFutile] raised when no element found, two or more
+  #        elements found or the elemnt is not a select or an option
+  # @return [Nokogiri::XML::Node] the element selected
   def select(locator, what)
+    select = find_element(locator, 'select')
+    select.xpath('.//option[@selected]').each do |opt|
+      opt.delete('selected')
+    end unless select['multiple']
+    selected = find_element_in(what, 'option', select)
+    selected['selected'] = 'true'
+    selected
   end
 
   ##

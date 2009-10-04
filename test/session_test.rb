@@ -192,4 +192,20 @@ class SessionTest < Futile::TestCase
     @futile.get("http://0.0.0.0:6666/form")
     assert session != @futile.send(:session)
   end
+
+  def test_select_singleselect
+    @futile.get("/form")
+    @futile.select("p13", "here")
+    @futile.click_button("button post")
+    assert_match(/p13:not selected/, @futile.response.body)
+    assert_no_match(/p13:selected/, @futile.response.body)
+  end
+
+  def test_select_multiselect
+    @futile.get("/form")
+    @futile.select("p14", "here")
+    @futile.click_button("submit post")
+    assert_match(/p14:selected/, @futile.response.body)
+    assert_match(/p14:not selected/, @futile.response.body)
+  end
 end
