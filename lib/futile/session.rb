@@ -187,27 +187,39 @@ class Futile::Session
   #  select("#this", "#that") # => <option id="that" selected>Text</option>
   #
   # @param [String] locator select's inner html or xpath/css locator
-  # @param [String] what the desired option's inner html or xpath/css locator
+  # @param [String] the desired option's inner html or xpath/css locator
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
   #        elements found or the elemnt is not a select or an option
   # @raise [Futile::SelectIsFutile] raised when trying to select a
   #        disabled option
   # @return [Nokogiri::XML::Node] the element selected
   def select(locator, what)
-    select = find_element(locator, 'select')
-    raise Futile::SearchIsFutile.new("Cannot find '#{locator}'") unless select
+    select, option = find_select_and_option(locator, what)
     select.xpath('.//option[@selected]').each do |opt|
       opt.delete('selected')
     end unless select['multiple']
-    selected = find_element_in(what, 'option', select)
-    raise Futile::SearchIsFutile.new("Cannot find '#{what}' in #{select}") unless selected
-    raise Futile::SelectIsFutile.new("The option denoted by '#{what}' in #{select} is disabled") if selected['disabled']
-    selected['selected'] = 'true'
-    selected
+    option['selected'] = 'true'
+    option
   end
 
-  # This will be needed for multiselects
-  def unselect
+  ##
+  # Unselects an option from a multiselect
+  # 
+  #  select("#this", "#that") # => <option id="that">Text</option>
+  #
+  # @param [String] locator select's inner html or xpath/css locator
+  # @param [String] the option's to unselect inner html or xpath/css locator
+  # @raise [Futile::SearchIsFutile] raised when no element found, two or more
+  #        elements found or the elemnt is not a select or an option
+  # @raise [Futile::SelectIsFutile] raised when trying to unselect an
+  #        unselected option or when trying to unselecte from a singleselect
+  # @return [Nokogiri::XML::Node] the element unselected
+  def unselect(locator, what)
+    select, option = find_select_and_option(locator, what)
+    raise Futile::SelectIsFutile.new("\"#{select}\" does not allow multiple selections") unless select['multiple']
+    raise Futile::SelectIsFutile.new("Option \"#{what}\" in \"#{select}\" is not selected") unless option['selected']
+    option.delete('selected')
+    option
   end
 
   ##

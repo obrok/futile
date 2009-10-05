@@ -22,6 +22,15 @@ module Futile::Helpers
     element    
   end
 
+  def find_select_and_option(locator, what)
+    select = find_element(locator, 'select')
+    raise Futile::SearchIsFutile.new("Cannot find '#{locator}'") unless select
+    option = find_element_in(what, 'option', select)
+    raise Futile::SearchIsFutile.new("Cannot find '#{what}' in #{select}") unless option
+    raise Futile::SelectIsFutile.new("The option denoted by '#{what}' in #{select} is disabled") if option['disabled']
+    [select, option]
+  end
+
   def xpath_expression(name, opts)
     conditions = []
     opts.each do |k,v|

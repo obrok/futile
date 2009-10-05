@@ -224,6 +224,32 @@ class SessionTest < Futile::TestCase
     assert_raise(Futile::SelectIsFutile){@futile.select("p13", "#disabled")}
   end
 
+  def test_unselect
+    @futile.get("/form")
+    @futile.unselect("p14", "selected1")
+    @futile.click_button("button post")
+    assert_no_match(/p14:selected1/, @futile.response.body)
+    assert_match(/p14:selected2/, @futile.response.body)
+  end
+
+  def test_unselect_from_singleselect
+    @futile.get("/form")
+    assert_raise(Futile::SelectIsFutile){@futile.unselect("p13", "selected")}
+  end
+
+  def test_unselect_not_selected
+    @futile.get("/form")
+    assert_raise(Futile::SelectIsFutile){@futile.unselect("p14", "not selected")}
+  end
+
+  def test_unselect_last_option
+    @futile.get("/form")
+    @futile.unselect("p14", "selected1")
+    @futile.unselect("p14", "selected2")
+    @futile.click_button("button post")
+    assert_no_match(/p14/, @futile.response.body)
+  end
+
   def test_reset_happy_path
     @futile.get("/form")
     @futile.fill("p1", "u1")
