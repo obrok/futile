@@ -108,11 +108,17 @@ class Futile::Session
   # @raise [Futile::ButtonIsFutile] raised when the button specified by
   #        _locator_ is not inside a <form>
   def click_button(locator)
-    button = find_element(locator, :button) || find_element(locator, :input, :type => 'submit')
+    button = find_element(locator, :button) ||
+             find_element(locator, :input, :type => 'submit') ||
+             find_element(locator, :input, :type => 'reset')
     raise Futile::SearchIsFutile.new("Could not find \"#{locator}\" button") unless button
     form = find_parent(button, 'form')
-    data = build_params(form, button)
-    request(form['action'], form['method'] || POST, data)
+    if button["type"] == "reset"
+      reset_form(form)
+    else
+      data = build_params(form, button)
+      request(form['action'], form['method'] || POST, data)
+    end
   rescue NoMethodError
     raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form")
   end
@@ -238,7 +244,7 @@ class Futile::Session
     checkbox = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
     if checkbox.name != "input" or checkbox["type"] != "checkbox"
-      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
+      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [checkbox])
     end
     unless checkbox["checked"]
       raise Futile::CheckIsFutile.new("Element '%s' already unchecked" % [checkbox])
@@ -305,5 +311,8 @@ class Futile::Session
       [*v].each {|element| params << "#{CGI.escape(k.to_s)}=#{CGI.escape(element.to_s)}"}
     end
     params.join('&')
+  end
+
+  def reset_form(form)
   end
 end

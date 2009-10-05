@@ -223,4 +223,29 @@ class SessionTest < Futile::TestCase
     @futile.get("/form")
     assert_raise(Futile::SelectIsFutile){@futile.select("p13", "#disabled")}
   end
+
+  def test_reset_happy_path
+    @futile.get("/form")
+    @futile.fill("p1", "u1")
+    @futile.uncheck("p8")
+    @futile.fill("p5", "textarea mod")
+    @futile.click_button("reset1")
+    assert_equal "init value", @futile.response.parsed_body.at("#id0")["value"]
+    assert @futile.response.parsed_body.at("#id6").has_attribute?("checked")
+    assert_equal "Initial value", @futile.response.parsed_body.at("#id4").inner_html
+  end
+
+  def test_doesnt_reset_other_form
+    @futile.get("/form")
+    @futile.fill("kraps", "other")
+    @futile.click_button("reset1")
+    assert_equal "other", @futile.response.parsed_body.at("#kraps")["value"]
+  end
+
+  def test_uncheck_not_checkbox
+    assert_raises(Futile::SearchIsFutile) do
+      @futile.get("/form")
+      @futile.uncheck("p9")
+    end
+  end
 end
