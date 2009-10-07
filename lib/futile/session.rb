@@ -1,3 +1,4 @@
+require "ruby-debug"
 ##
 # This class is the base class which is used to perform requests and check
 # results.
@@ -97,8 +98,9 @@ class Futile::Session
 
   ##
   # Clicks button (HTML tag <submit> or <button>) specified by _locator_. This means
-  # that a request to path found in the containing form's _action_ attribute is
-  # performed with the appropriate method
+  # that either a request to path found in the containing form's _action_ attribute is
+  # performed with the appropriate method or a reset button is clicked and
+  # current form is reset.
   #
   # @param [String] locator locator to specify a button. This can be either the
   #        inner html of link or xpath/css locator
@@ -326,5 +328,7 @@ class Futile::Session
   end
 
   def reset_form(form)
+    original_form = response.original_parsed_body.at(form.path)
+    form.replace(original_form)
   end
 end
