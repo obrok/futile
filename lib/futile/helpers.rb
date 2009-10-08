@@ -50,10 +50,14 @@ module Futile::Helpers
       # if the label was found locate element it was labeling
       element = response.parsed_body.at("//input[@id='%s']" % [label["for"]])
       element ||= response.parsed_body.at("//textarea[@id='%s']" % [label["for"]])
+
     else
-      # else try to find element by name
+      # try to find element by name
       element = response.parsed_body.at("//input[@name='%s']" % [locator])
       element ||= response.parsed_body.at("//textarea[@name='%s']" % [locator])
+
+      # try to find element by value
+      element ||= response.parsed_body.at("//input[@value='%s']" % [locator])
     end
 
     # don't bother, the element is no more

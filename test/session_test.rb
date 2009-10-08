@@ -280,4 +280,23 @@ class SessionTest < Futile::TestCase
     @futile.click_link("referer")
     assert_match(/simple_get/, @futile.response.body)
   end
+
+  def test_select_radio_button_unselects_other_from_group
+    @futile.get("/form")
+    @futile.check("radio value 1")
+    assert @futile.response.parsed_body.at("#id8")["checked"]
+    assert_nil @futile.response.parsed_body.at("#id9")["checked"]
+    assert_nil @futile.response.parsed_body.at("#id10")["checked"]
+    @futile.check("radio value 3")
+    assert_nil @futile.response.parsed_body.at("#id8")["checked"]
+    assert_nil @futile.response.parsed_body.at("#id9")["checked"]
+    assert @futile.response.parsed_body.at("#id10")["checked"]
+  end
+
+  def test_check_invalid_element_raises_futile_check_error
+    @futile.get("/form")
+    assert_raises(Futile::SearchIsFutile) do
+      @futile.check("#dontexistlolo123")
+    end
+  end
 end

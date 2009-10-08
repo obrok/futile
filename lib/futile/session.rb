@@ -225,7 +225,7 @@ class Futile::Session
   end
 
   ##
-  # Use this method to check a checkbox input specified by _locator_.
+  # Use this method to check a checkbox/radiobutton input specified by _locator_.
   #
   #  # => <input type="checkbox" name="foo" value="on">
   #  session.check("foo") # => <input type="checkbox" name="foo" value="on" checked>
@@ -236,13 +236,19 @@ class Futile::Session
   def check(locator)
     checkbox = find_input(locator)
     raise Futile::SearchIsFutile.new("Cannot find '%s'" % [locator]) unless checkbox
-    if checkbox.name != "input" or checkbox["type"] != "checkbox"
-      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox" % [element])
+    if checkbox.name != "input" and (checkbox["type"] != "checkbox" or checkbox["type"] != "radio")
+      raise Futile::SearchIsFutile.new("Element '%s' is not a checkbox/radio" % [checkbox])
     end
     if checkbox["checked"]
       raise Futile::CheckIsFutile.new("Element '%s' already checked" % [checkbox])
     end
-    checkbox["checked"] = "checked"
+    if checkbox["type"] == "checkbox"
+      checkbox["checked"] = "checked"
+    elsif checkbox["type"] == "radio"
+      radios = response.parsed_body.search("//input[@type='radio' and @name='%s']" % [checkbox["name"]])
+      radios.each { |radio| radio.remove_attribute("checked") }
+      checkbox["checked"] = "checked"
+    end
   end
 
   ##
