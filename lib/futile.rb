@@ -7,6 +7,7 @@ module Futile
 end
 
 require "futile/exceptions"
-require "futile/helpers"
+require "futile/locators"
+require "futile/interaction"
 require "futile/response"
 require "futile/session"

@@ -1,4 +1,4 @@
-module Futile::Helpers
+module Futile::Locators
   private
   def find_link(locator)
     find_element(locator, :a)
