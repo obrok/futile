@@ -1,5 +1,3 @@
- * check radio buttons (groups etc)
- * handling a reset button - this seems like a nightmare
-   with our chosen way of updating form data
+ * check radio buttons (groups etc) (michal.bugno)
  * request headers (mimic browsers etc.)
  * get params
