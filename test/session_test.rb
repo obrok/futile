@@ -274,4 +274,10 @@ class SessionTest < Futile::TestCase
       @futile.uncheck("p9")
     end
   end
+
+  def test_referer_sent
+    @futile.get("/simple_get")
+    @futile.click_link("referer")
+    assert_match(/simple_get/, @futile.response.body)
+  end
 end

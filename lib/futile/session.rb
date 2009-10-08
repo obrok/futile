@@ -32,8 +32,8 @@ class Futile::Session
   #
   # @param [String] uri uri to request
   # @return [Futile::Response] response from the server to the request
-  def get(uri)
-    request(uri, GET)
+  def get(uri, headers={})
+    request(uri, GET, {}, headers)
   end
 
   # Performs a request on _uri_
@@ -48,7 +48,7 @@ class Futile::Session
   # @param [String] method request method
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
-  def request(uri, method, data = {})
+  def request(uri, method, data = {}, headers={})
     reset_state
     @uri = process_uri(uri)
     if session_changed?
@@ -58,7 +58,7 @@ class Futile::Session
     method = method.upcase
     result = case method
              when GET
-               session.get(path)
+               session.get(path, headers)
              when POST
                session.post(path, hash_to_params(data))
              else
@@ -92,7 +92,7 @@ class Futile::Session
       @uri.fragment = href[1 .. -1]
       response
     else
-      get(href)
+      get(href, 'Referer' => @uri.to_s)
     end
   end
 
