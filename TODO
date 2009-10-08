@@ -1,2 +1,4 @@
  * request headers (mimic browsers etc.)
  * get params
+ * #within method -- finding elements in scope
+ * refactor finders -- like allowing only inner html for clicking links

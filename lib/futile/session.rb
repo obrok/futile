@@ -12,14 +12,14 @@ class Futile::Session
   ##
   # Initialize with url/port of the tested page.
   #
-  #  app = Futile::Session.new("http://localhost:3000")
-  # would test your Rails application
-  #
-  #  app = Futile::Session.new("http://www.google.com", {:max_redirects => 100})
-  # Set the number of redirects considered to be an infinite redirect.
-  #
+  # @example Testing Rails application
+  #   session = Futile::Session.new("http://localhost:3000")
+  # @example Overriding default :max_redirects option
+  #   session = Futile::Session.new("http://www.google.com", {:max_redirects => 100})
   # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
+  # @option opts [Fixnum] :max_redirects (10) Number of redirects considered to be
+  #  infinite
   def initialize(path, opts = {})
     @uri = process_uri(path)
     @session = Net::HTTP.start(@uri.host, @uri.port)
@@ -40,10 +40,10 @@ class Futile::Session
   # Please keep in mind that the relative uri *must* begin with a slash ('/'), otherwise
   # the request will be invalid.
   #
-  #  app.get("/site")
-  #
   # You can pass an absolute uri.
   #
+  # @example make a get request to path '/site'
+  #   session.get("/site")
   # @param [String] uri relative path to request
   # @param [String] method request method
   # @return [Futile::Response] response from the server to the request
@@ -80,8 +80,8 @@ class Futile::Session
   # Current path (i.e. the path which was yielded by last request) together with
   # anchor if there is one.
   #
-  #  session.path # => "/my_page#new"
-  #
+  # @example Sample path of current page (including anchor)
+  #  session.path #=> "/my_page#new"
   # @return [String] current path (relative)
   def path
     [@uri.path, @uri.fragment].compact.join("#")
@@ -90,8 +90,8 @@ class Futile::Session
   ##
   # Absolute path of current page.
   #
-  #  session.full_path # => "http://google.pl/?q=goatse#no"
-  #
+  # @example Full path of current page (with params and anchor)
+  #   session.full_path #=> "http://google.pl/?q=goatse#no"
   # @return [String] absolute path
   def full_path
     @uri.to_s

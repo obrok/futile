@@ -19,7 +19,7 @@ module Futile::Locators
       return el if el.to_s.include?(locator)
     end
     element = node.at(locator) rescue nil
-    element    
+    element
   end
 
   def find_select_and_option(locator, what)

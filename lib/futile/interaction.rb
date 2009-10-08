@@ -56,8 +56,8 @@ module Futile::Interaction
   # Finds input element (HTML tags <input> and <textarea>) by its label or name
   # and fills it with _what_.
   #
-  #  fill("value", "Michal") # => <input name="param" value="Michal"/>
-  #
+  # @example Filling field named _param_ with value _Michal_
+  #   session.fill("param", "Michal") #=> <input name="param" value="Michal"/>
   # @param [String] locator label's inner html or xpath/css locator
   # @param [String] what the text to type into field
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
@@ -80,8 +80,8 @@ module Futile::Interaction
   ##
   # Selects an option from a select form element
   #
-  #  select("#this", "#that") # => <option id="that" selected>Text</option>
-  #
+  # @example Selecting option with id='that' in select with id='this'.
+  #   select("#this", "#that") #=> <option id="that" selected>Text</option>
   # @param [String] locator select's inner html or xpath/css locator
   # @param [String] the desired option's inner html or xpath/css locator
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
@@ -101,8 +101,8 @@ module Futile::Interaction
   ##
   # Unselects an option from a multiselect
   #
-  #  select("#this", "#that") # => <option id="that">Text</option>
-  #
+  # @example Unselecting (within multiselect fields)
+  #   select("#this", "#that") #=> <option id="that">Text</option>
   # @param [String] locator select's inner html or xpath/css locator
   # @param [String] the option's to unselect inner html or xpath/css locator
   # @raise [Futile::SearchIsFutile] raised when no element found, two or more
@@ -121,9 +121,9 @@ module Futile::Interaction
   ##
   # Use this method to check a checkbox/radiobutton input specified by _locator_.
   #
-  #  # => <input type="checkbox" name="foo" value="on">
-  #  session.check("foo") # => <input type="checkbox" name="foo" value="on" checked>
-  #
+  # @example Checking a checkbox named "foo"
+  #   #=> <input type="checkbox" name="foo" value="on">
+  #   session.check("foo") #=> <input type="checkbox" name="foo" value="on" checked>
   # @param [String] locator label/name of checkbox
   # @raise [Futile::SearchIsFutile] raised when element not found
   # @raise [Futile::CheckIsFutile] raised when checkbox is already checked
@@ -148,9 +148,9 @@ module Futile::Interaction
   ##
   # Use this method to uncheck a checkbox input specified by _locator_.
   #
-  #  # => <input type="checkbox" name="foo" value="on" checked>
-  #  session.uncheck("foo") # => <input type="checkbox" name="foo" value="on">
-  #
+  # @example Unchecking checkbox named "foo"
+  #   #=> <input type="checkbox" name="foo" value="on" checked>
+  #   session.uncheck("foo") #=> <input type="checkbox" name="foo" value="on">
   # @param [String] locator label/name of checkbox
   # @raise [Futile::SearchIsFutile] raised when element not found
   # @raise [Futile::CheckIsFutile] raised when checkbox is not checked
