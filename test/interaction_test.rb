@@ -277,4 +277,11 @@ class HelpersTest < Futile::TestCase
     @futile.click_link("nested in")
     assert_equal 200, @futile.response.status
   end
+
+  def test_sending_form_without_method
+    @futile.get("/form_without_method")
+    @futile.fill("q", "michal bugno")
+    @futile.click_button("Search is Futile")
+    assert_equal 200, @futile.response.status
+  end
 end

@@ -53,6 +53,10 @@ module TestServer
     resp.body = parse_erb("form.erb")
   end
 
+  SERVER.mount_proc("/form_without_method") do |req, resp|
+    resp.body = parse_erb("form_without_method.erb")
+  end
+
   SERVER.mount_proc("/doit") do |req, resp|
     resp.body = "<html><body>" + req.request_method
     req.query.each do |k, v|
