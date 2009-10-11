@@ -121,8 +121,8 @@ class Futile::Session
   end
 
   def follow_redirect
-    @uri = response.headers["location"]
-    @response = Futile::Response.new(session.get(@uri))
+    path = response.headers["location"].first
+    @response = Futile::Response.new(session.get(path))
     @no_redirects += 1
   end
 

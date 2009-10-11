@@ -47,3 +47,8 @@ end
 
 desc "Run tests, generate doc and build gem"
 task :release => [:clean, :test, :yardoc, :gem]
+
+desc "Installs gem"
+task :install => [:release] do
+  `sudo gem install pkg/*.gem`
+end
