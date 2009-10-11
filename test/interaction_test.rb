@@ -265,4 +265,16 @@ class HelpersTest < Futile::TestCase
       @futile.check("#dontexistlolo123")
     end
   end
+
+  def test_click_link_without_leading_slash
+    @futile.get("/simple_get")
+    @futile.click_link("link without leading slash")
+    assert_equal 200, @futile.response.status
+  end
+
+  def test_nested_html_relative_url
+    @futile.get("/nested_path/index.html")
+    @futile.click_link("nested in")
+    assert_equal 200, @futile.response.status
+  end
 end

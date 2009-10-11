@@ -37,6 +37,14 @@ module TestServer
     resp.status = 302
   end
 
+  SERVER.mount_proc("/nested_path/index.html") do |req, resp|
+    resp.body = parse_erb("nested_path.erb")
+  end
+
+  SERVER.mount_proc("/nested_path/nested_in.html") do |req, resp|
+    resp.body = parse_erb("nested_path.erb")
+  end
+
   def self.content=(value)
     @@content = value
   end

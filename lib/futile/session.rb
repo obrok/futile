@@ -37,8 +37,6 @@ class Futile::Session
   end
 
   # Performs a request on _uri_
-  # Please keep in mind that the relative uri *must* begin with a slash ('/'), otherwise
-  # the request will be invalid.
   #
   # You can pass an absolute uri.
   #
@@ -134,6 +132,12 @@ class Futile::Session
 
   def process_uri(uri)
     uri = URI.parse(uri.to_s)
+    if uri.is_a?(URI::Generic) # relative path
+      if uri.to_s[0, 1] != "/" # relative to last folder
+        base = File.dirname(@uri.path) rescue ""
+        uri.path = File.join(base, uri.path).squeeze("/")
+      end
+    end
     uri.port = uri.port || @uri.port || 80
     unless uri.is_a?(URI::HTTP)
       uri.host = @uri.host
