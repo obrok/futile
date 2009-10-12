@@ -46,7 +46,7 @@ module Futile::Interaction
       reset_form(form)
     else
       data = build_params(form, button)
-      request(form['action'], form['method'] || Futile::Session::POST, data)
+      request(form['action'], form['method'] || Futile::Session::GET, data)
     end
   rescue NoMethodError
     raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form")

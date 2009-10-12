@@ -278,10 +278,11 @@ class HelpersTest < Futile::TestCase
     assert_equal 200, @futile.response.status
   end
 
-  def test_sending_form_without_method
+  def test_sending_form_without_method_uses_get
     @futile.get("/form_without_method")
     @futile.fill("q", "michal bugno")
     @futile.click_button("Search is Futile")
     assert_equal 200, @futile.response.status
+    assert @futile.get?
   end
 end

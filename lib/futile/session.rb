@@ -62,6 +62,7 @@ class Futile::Session
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end
+    @request_method = method
     @response = Futile::Response.new(result)
     while response.redirect? and not infinite_redirect?
       follow_redirect
@@ -105,6 +106,14 @@ class Futile::Session
 
   def disconnect
     @session.finish
+  end
+
+  def get?
+    @request_method == GET
+  end
+
+  def post?
+    @request_method == POST
   end
 
   private

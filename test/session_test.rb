@@ -46,4 +46,9 @@ class SessionTest < Futile::TestCase
     @futile.get("/single_redirect")
     assert @futile.instance_variable_get(:@uri).is_a?(URI::HTTP)
   end
+
+  def test_post_method
+    @futile.request("/doit", Futile::Session::POST)
+    assert @futile.post?
+  end
 end
