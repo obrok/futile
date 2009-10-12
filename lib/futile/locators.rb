@@ -15,11 +15,16 @@ module Futile::Locators
   end
 
   def find_element_in(locator, name, node, opts={})
+    found = []
     node.xpath(xpath_expression(name, opts)).each do |el|
-      return el if el.to_s.include?(locator)
+      found << el if el.to_s.include?(locator)
     end
-    element = node.at(locator) rescue nil
-    element
+    raise Futile::SearchIsFutile.new("Multiple elements found for '%s'" % [locator]) if found.size > 1
+    element = found.first
+    return element if element
+    found = node.search(locator) rescue []
+    raise Futile::SearchIsFutile.new("Multiple elements found for '%s'" % [locator]) if found.size > 1
+    return found.first
   end
 
   def find_select_and_option(locator, what)
