@@ -48,7 +48,7 @@ class SessionTest < Futile::TestCase
   end
 
   def test_post_method
-    @futile.request("/doit", Futile::Session::POST)
+    @futile.request("/doit", {:method => Futile::Session::POST})
     assert @futile.post?
   end
 
