@@ -51,4 +51,9 @@ class SessionTest < Futile::TestCase
     @futile.request("/doit", Futile::Session::POST)
     assert @futile.post?
   end
+
+  def test_redirection_sets_correct_uri
+    @futile.get("/single_redirect")
+    assert_equal "/simple_get", @futile.path
+  end
 end

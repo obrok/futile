@@ -47,7 +47,6 @@ class Futile::Session
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
   def request(uri, method, data = {}, headers={})
-    reset_state
     @uri = process_uri(uri)
     if session_changed?
       disconnect
@@ -64,14 +63,13 @@ class Futile::Session
              end
     @request_method = method
     @response = Futile::Response.new(result)
-    while response.redirect? and not infinite_redirect?
+
+    if response.redirect?
       follow_redirect
-    end
-    if infinite_redirect?
-      raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri)
     else
-      response
+      reset_state
     end
+    response
   end
 
 
@@ -130,9 +128,9 @@ class Futile::Session
   end
 
   def follow_redirect
-    path = response.headers["location"].first
-    @response = Futile::Response.new(session.get(path))
+    raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri) if infinite_redirect?
     @no_redirects += 1
+    get(response.headers["location"].first)
   end
 
   def reset_state
