@@ -108,12 +108,45 @@ class Futile::Session
     @session.finish
   end
 
+  ##
+  # @return [Boolean] true if last request was GET
   def get?
     @request_method == GET
   end
 
+  ##
+  # @return [Boolean] true if last request was POST
   def post?
     @request_method == POST
+  end
+
+  ##
+  # Use this method to perform any action within scope of filtered HTML.
+  #
+  # @example
+  #   app.within("#menu") do
+  #     app.within("//div[1]") do
+  #       app.click_link("Item")
+  #     end
+  #   end
+  # @raise [Futile::SearchIsFutile] when scope is not found or multiple scopes
+  #   match the _locator_
+  # @yield [Futile::Session] session with body in context of _locator_
+  def within(locator, &block)
+    old_body = response.parsed_body.dup
+    elements = response.parsed_body.search(locator)
+    if elements.size > 1
+      raise Futile::SearchIsFutile.new("Multiple elements found for scope '%s'" % [locator])
+    end
+    element = elements.first
+    raise Futile::SearchIsFutile.new("Scope '%s' not found" % [locator]) unless element
+    old_response = response
+    response.parsed_body.root.replace(element)
+    yield
+  ensure
+    if response == old_response # we didn't make any request, back to original body
+      response.parsed_body.root.replace(old_body.root)
+    end
   end
 
   private

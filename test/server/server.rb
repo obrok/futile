@@ -71,6 +71,10 @@ module TestServer
     resp.body = "<html><body>" + req["Referer"].to_s + "</body></html>"
   end
 
+  SERVER.mount_proc("/scoped_links") do |req, resp|
+    resp.body = parse_erb("scoped_links.erb")
+  end
+
   Thread.fork do
     SERVER.start
   end
