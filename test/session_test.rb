@@ -48,7 +48,7 @@ class SessionTest < Futile::TestCase
   end
 
   def test_post_method
-    @futile.request("/doit", Futile::Session::POST)
+    @futile.request("/doit", {:method => Futile::Session::POST})
     assert @futile.post?
   end
 
@@ -109,5 +109,10 @@ class SessionTest < Futile::TestCase
       end
     end
     assert /my_text=msq/, @futile.path
+  end
+
+  def test_redirection_sets_correct_uri
+    @futile.get("/single_redirect")
+    assert_equal "/simple_get", @futile.path
   end
 end

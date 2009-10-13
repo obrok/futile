@@ -19,7 +19,7 @@ module Futile::Interaction
       @uri.fragment = href[1 .. -1]
       response
     else
-      get(href, 'Referer' => @uri.to_s)
+      get(href, {:headers => {'Referer' => @uri.to_s}})
     end
   end
 
@@ -46,7 +46,7 @@ module Futile::Interaction
       reset_form(form)
     else
       data = build_params(form, button)
-      request(form['action'], form['method'] || Futile::Session::GET, data)
+      request(form['action'], {:method => form['method'] || Futile::Session::GET, :data => data})
     end
   rescue NoMethodError
     raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form")

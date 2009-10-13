@@ -31,9 +31,10 @@ class Futile::Session
   # Perform GET request on _uri_.
   #
   # @param [String] uri uri to request
+  # @param [Hash] opts Same as opts for {Session#request}
   # @return [Futile::Response] response from the server to the request
-  def get(uri, headers={})
-    request(uri, GET, {}, headers)
+  def get(uri, opts={})
+    request(uri, {:method => GET, :headers => opts[:headers]})
   end
 
   # Performs a request on _uri_
@@ -43,35 +44,38 @@ class Futile::Session
   # @example make a get request to path '/site'
   #   session.get("/site")
   # @param [String] uri relative path to request
-  # @param [String] method request method
+  # @param [Hash] opts Miscellenous options
+  # @option opts [#to_s] :method The request method. You cas use Futile::Session::GET and Futile::Session::POST
+  # @option opts [Hash] :data The data to be sent. Method to_s will be called on both keys
+  #   and values to create the request data.
+  # @option opts [Hash] :headers Any custom headers that should be added to the request.
+  #   Method to_s will be called on both keys and values to produce the actual headers.
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
-  def request(uri, method, data = {}, headers={})
-    reset_state
+  def request(uri, opts={})
     @uri = process_uri(uri)
     if session_changed?
       disconnect
       @session = Net::HTTP.start(@uri.host, @uri.port)
     end
-    method = method.upcase
+    method = opts[:method].upcase
     result = case method
              when GET
-               session.get(path, headers)
+               session.get(path, opts[:headers])
              when POST
-               session.post(path, hash_to_params(data))
+               session.post(path, hash_to_params(opts[:data] || {}))
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end
     @request_method = method
     @response = Futile::Response.new(result)
-    while response.redirect? and not infinite_redirect?
+
+    if response.redirect?
       follow_redirect
-    end
-    if infinite_redirect?
-      raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri)
     else
-      response
+      reset_state
     end
+    response
   end
 
 
@@ -163,9 +167,9 @@ class Futile::Session
   end
 
   def follow_redirect
-    path = response.headers["location"].first
-    @response = Futile::Response.new(session.get(path))
+    raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri) if infinite_redirect?
     @no_redirects += 1
+    get(response.headers["location"].first)
   end
 
   def reset_state
