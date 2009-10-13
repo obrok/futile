@@ -6,8 +6,10 @@ module Futile::Locators
 
   def find_parent(element, name)
     parent = element.parent
-    parent = parent.parent while parent.name != name
-    parent
+    while parent.respond_to?(:parent) and parent.name != name
+      parent = parent.parent
+    end
+    parent.name == name ? parent : nil
   end
 
   def find_element(locator, name, opts={})

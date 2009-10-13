@@ -42,14 +42,13 @@ module Futile::Interaction
              find_element(locator, :input, :type => 'reset')
     raise Futile::SearchIsFutile.new("Could not find \"#{locator}\" button") unless button
     form = find_parent(button, 'form')
+    raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form") unless form
     if button["type"] == "reset"
       reset_form(form)
     else
       data = build_params(form, button)
       request(form['action'], {:method => form['method'] || Futile::Session::GET, :data => data})
     end
-  rescue NoMethodError
-    raise Futile::ButtonIsFutile.new("The button \"#{locator}\" does not belong to a form")
   end
 
   ##

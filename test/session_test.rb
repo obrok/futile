@@ -115,4 +115,9 @@ class SessionTest < Futile::TestCase
     @futile.get("/single_redirect")
     assert_equal "/simple_get", @futile.path
   end
+
+  def test_get_post_consts_are_frozen
+    assert_raises(TypeError) { Futile::Session::GET[1, 1] = "u" }
+    assert_raises(TypeError) { Futile::Session::POST[1, 1] = "e" }
+  end
 end

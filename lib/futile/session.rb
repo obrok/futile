@@ -4,8 +4,8 @@ class Futile::Session
   include Futile::Locators
   include Futile::Interaction
 
-  GET  = "GET"
-  POST = "POST"
+  GET  = "GET".freeze
+  POST = "POST".freeze
 
   attr_reader :response
 
