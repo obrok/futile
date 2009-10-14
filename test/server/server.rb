@@ -67,8 +67,12 @@ module TestServer
     resp.body += "</body></html>"
   end
 
-  SERVER.mount_proc("/referer") do |req, resp|
-    resp.body = "<html><body>" + req["Referer"].to_s + "</body></html>"
+  SERVER.mount_proc("/headers") do |req, resp|
+    resp.body = "<html><body>"
+    req.each do |k, v|
+      resp.body << "\n#{k}:#{v}"
+    end
+    resp.body << "</body></html>"
   end
 
   Thread.fork do

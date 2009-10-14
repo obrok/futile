@@ -44,7 +44,7 @@ class Futile::Session
   # @example make a get request to path '/site'
   #   session.get("/site")
   # @param [String] uri relative path to request
-  # @param [Hash] opts Miscellenous options
+  # @param [Hash] opts Miscellanous options
   # @option opts [#to_s] :method The request method. You cas use Futile::Session::GET and Futile::Session::POST
   # @option opts [Hash] :data The data to be sent. Method to_s will be called on both keys
   #   and values to create the request data.
