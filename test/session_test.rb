@@ -52,8 +52,72 @@ class SessionTest < Futile::TestCase
     assert @futile.post?
   end
 
+  def test_scoped_links
+    @futile.get("/scoped_links")
+    assert_raises(Futile::SearchIsFutile) do
+      @futile.click_link("one")
+    end
+    @futile.within("#scope1") do
+      @futile.click_link("one")
+      assert @futile.path =~ /simple_get/
+    end
+    assert_equal(Nokogiri.parse(TestServer.parse_erb("simple_html.erb")).to_s,
+      @futile.response.parsed_body.to_s)
+  end
+
+  def test_scoped_form
+    @futile.get("/scoped_links")
+    parsed = @futile.response.parsed_body.dup
+    assert_raises(Futile::SearchIsFutile) do
+      @futile.click_link("one")
+    end
+    @futile.within("#scope2") do
+      @futile.click_button("Click")
+      assert @futile.path =~ /form_without_method/
+    end
+    assert_equal(Nokogiri.parse(TestServer.parse_erb("form_without_method.erb")).to_s,
+      @futile.response.parsed_body.to_s)
+  end
+
+  def test_scoped_doesnt_change_body_when_no_request
+    @futile.get("/scoped_links")
+    parsed = @futile.response.parsed_body.dup
+    @futile.within("#scope2") do
+      # nothing
+    end
+    assert_equal parsed.to_s, @futile.response.parsed_body.to_s
+  end
+
+  def test_scoped_raises_when_scope_not_found
+    @futile.get("/scoped_links")
+    parsed = @futile.response.parsed_body.dup
+    assert_raises(Futile::SearchIsFutile) do
+      @futile.within("#scope_not_existing") do
+      end
+    end
+  end
+
+  def test_double_within
+    @futile.get("/scoped_links")
+    @futile.within("#scope3") do
+      @futile.click_link("destiny")
+      @futile.within("//div[@id='scope3']/div[1]") do
+        assert_raises(Futile::SearchIsFutile) do
+          @futile.click_link("destiny")
+        end
+        @futile.click_link("pick")
+      end
+    end
+    assert /my_text=msq/, @futile.path
+  end
+
   def test_redirection_sets_correct_uri
     @futile.get("/single_redirect")
     assert_equal "/simple_get", @futile.path
+  end
+
+  def test_get_post_consts_are_frozen
+    assert_raises(TypeError) { Futile::Session::GET[1, 1] = "u" }
+    assert_raises(TypeError) { Futile::Session::POST[1, 1] = "e" }
   end
 end
