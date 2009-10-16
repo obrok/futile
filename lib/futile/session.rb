@@ -19,11 +19,14 @@ class Futile::Session
   # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
   # @option opts [Fixnum] :max_redirects (10) Number of redirects considered to be
-  #  infinite
+  #   infinite
+  # @option opts [Symbol] :default_browser (:firefox3) Browser-specific request
+  #   headers
   def initialize(path, opts = {})
     @uri = process_uri(path)
     @session = Net::HTTP.start(@uri.host, @uri.port)
     @max_redirects = opts[:max_redirects] || 10
+    @default_browser = opts[:default_browser] || :firefox3
     reset_state
   end
 
@@ -160,7 +163,7 @@ class Futile::Session
   def headers
     unless @_headers
       @_headers = Futile::Headers.new
-      @_headers.browser = :firefox3
+      @_headers.browser = @default_browser
     end
     @_headers
   end

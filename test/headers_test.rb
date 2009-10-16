@@ -29,6 +29,14 @@ class HeadersTest < Futile::TestCase
     end
   end
 
+  def test_default_browser
+    @futile = Futile::Session.new("localhost:6666", {:default_browser => :just_to_check})
+    exception = assert_raises(Futile::ResistanceIsFutile) do
+      @futile.headers
+    end
+    assert_include "just_to_check", exception.message
+  end
+
   private
   def parse_response_headers(body)
     headers_params = body.split("\n")[1..-2]
