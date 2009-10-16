@@ -71,6 +71,14 @@ module TestServer
     resp.body = "<html><body>" + req["Referer"].to_s + "</body></html>"
   end
 
+  SERVER.mount_proc("/request_headers") do |req, resp|
+    resp.body = "<html><body>\n"
+    req.header.each do |key, value|
+      resp.body << "%s => %s\n" % [key.downcase, value]
+    end
+    resp.body << "</body></html>"
+  end
+
   SERVER.mount_proc("/scoped_links") do |req, resp|
     resp.body = parse_erb("scoped_links.erb")
   end

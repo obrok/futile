@@ -22,6 +22,12 @@ class Futile::TestCase < Test::Unit::TestCase
     assert where.include?(what), "%p doesn't include %p" % [where, what]
   end
 
+  def assert_header(headers, name, value)
+    assert headers.has_key?(name), "No '%s' header set" % [name]
+    real_value = headers[name]
+    assert_equal value, real_value
+  end
+
   def test_default
     # just to get rid of annoying warning: "No tests were specified."
   end

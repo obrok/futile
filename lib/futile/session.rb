@@ -45,7 +45,7 @@ class Futile::Session
   #   session.get("/site")
   # @param [String] uri relative path to request
   # @param [Hash] opts Miscellenous options
-  # @option opts [#to_s] :method The request method. You cas use Futile::Session::GET and Futile::Session::POST
+  # @option opts [#to_s] :method The request method. You can use Futile::Session::GET and Futile::Session::POST
   # @option opts [Hash] :data The data to be sent. Method to_s will be called on both keys
   #   and values to create the request data.
   # @option opts [Hash] :headers Any custom headers that should be added to the request.
@@ -61,7 +61,7 @@ class Futile::Session
     method = opts[:method].upcase
     result = case method
              when GET
-               session.get(path, opts[:headers])
+               session.get(path, headers.merge(opts[:headers] || {}))
              when POST
                session.post(path, hash_to_params(opts[:data] || {}))
              else
@@ -151,6 +151,18 @@ class Futile::Session
     if response == old_response # we didn't make any request, back to original body
       response.parsed_body.root.replace(old_body.root)
     end
+  end
+
+  ##
+  # Hash of headers sent with next request.
+  #
+  # @return [Futile::Headers] request headers
+  def headers
+    unless @_headers
+      @_headers = Futile::Headers.new
+      @_headers.browser = :firefox3
+    end
+    @_headers
   end
 
   private
