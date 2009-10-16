@@ -1,5 +1,11 @@
 ##
 # Base exception for all Futile exceptions
+#
+# @see Futile::ButtonIsFutile
+# @see Futile::CheckIsFutile
+# @see Futile::RedirectIsFutile
+# @see Futile::SearchIsFutile
+# @see Futile::SelectIsFutile
 class Futile::ResistanceIsFutile < Exception
 end
 

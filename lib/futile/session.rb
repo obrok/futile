@@ -176,9 +176,11 @@ class Futile::Session
     @no_redirects = 0
   end
 
-  def process_uri(uri)
-    uri = URI.parse(uri.to_s)
-    if uri.is_a?(URI::Generic) # relative path
+  def process_uri(path)
+    uri = URI.parse(path.to_s)
+    unless uri.is_a?(URI::HTTP) # relative path
+      # here we handle the case when user inits the session without http scheme
+      uri = URI.parse("http://%s" % [path.to_s]) unless @uri
       if uri.to_s[0, 1] != "/" # relative to last folder
         base = File.dirname(@uri.path) rescue ""
         uri.path = File.join(base, uri.path).squeeze("/")

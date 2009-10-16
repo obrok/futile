@@ -120,4 +120,9 @@ class SessionTest < Futile::TestCase
     assert_raises(TypeError) { Futile::Session::GET[1, 1] = "u" }
     assert_raises(TypeError) { Futile::Session::POST[1, 1] = "e" }
   end
+
+  def test_process_uri_without_http_scheme
+    path = Futile::Session.new("localhost:6666").full_path
+    assert_equal "http://localhost:6666/", path
+  end
 end
