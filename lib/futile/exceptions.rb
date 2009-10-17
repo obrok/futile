@@ -41,3 +41,8 @@ end
 # Raised when request was invalid (5xx)
 class Futile::RequestIsFutile < Futile::ResistanceIsFutile
 end
+
+##
+# Raised when an unsupported option is passed to a method
+class Futile::OptionIsFutile < Futile::ResistanceIsFutile
+end
