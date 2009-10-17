@@ -34,7 +34,7 @@ class Futile::Headers < Hash
       ACCEPT_LANGUAGE => "en-us".freeze,
       CONNECTION      => "keep-alive".freeze,
       USER_AGENT      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_1; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9".freeze,
-    }
+    },
   }.freeze
 
   ##
