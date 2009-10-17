@@ -15,6 +15,12 @@ class Futile::Response
   end
 
   ##
+  # @return [Boolean] true if response code was 5xx
+  def error?
+    status / 100 == 5
+  end
+
+  ##
   # This method returns actual body of the page. Note that this might be
   # afftected by methods which type/select/check elements.
   #

@@ -55,6 +55,7 @@ class Futile::Session
   #   Method to_s will be called on both keys and values to produce the actual headers.
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
+  # @raise [Futile::RequestIsFutile] when response status code is 5xx
   def request(uri, opts={})
     @uri = process_uri(uri)
     if session_changed?
@@ -77,6 +78,9 @@ class Futile::Session
       follow_redirect
     else
       reset_state
+    end
+    if response.error?
+      raise Futile::RequestIsFutile.new("Response was invalid (%d)" % [response.status])
     end
     response
   end
@@ -130,7 +134,7 @@ class Futile::Session
   ##
   # Use this method to perform any action within scope of filtered HTML.
   #
-  # @example
+  # @example Clicking link inside css/xpath selectors
   #   app.within("#menu") do
   #     app.within("//div[1]") do
   #       app.click_link("Item")
@@ -138,7 +142,6 @@ class Futile::Session
   #   end
   # @raise [Futile::SearchIsFutile] when scope is not found or multiple scopes
   #   match the _locator_
-  # @yield [Futile::Session] session with body in context of _locator_
   def within(locator, &block)
     old_body = response.parsed_body.dup
     elements = response.parsed_body.search(locator)
@@ -149,7 +152,7 @@ class Futile::Session
     raise Futile::SearchIsFutile.new("Scope '%s' not found" % [locator]) unless element
     old_response = response
     response.parsed_body.root.replace(element)
-    yield
+    block.call
   ensure
     if response == old_response # we didn't make any request, back to original body
       response.parsed_body.root.replace(old_body.root)

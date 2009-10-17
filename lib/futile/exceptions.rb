@@ -4,6 +4,7 @@
 # @see Futile::ButtonIsFutile
 # @see Futile::CheckIsFutile
 # @see Futile::RedirectIsFutile
+# @see Futile::RequestIsFutile
 # @see Futile::SearchIsFutile
 # @see Futile::SelectIsFutile
 class Futile::ResistanceIsFutile < Exception
@@ -34,4 +35,9 @@ end
 ##
 # Raised when selecting a disabled option
 class Futile::SelectIsFutile < Futile::ResistanceIsFutile
+end
+
+##
+# Raised when request was invalid (5xx)
+class Futile::RequestIsFutile < Futile::ResistanceIsFutile
 end

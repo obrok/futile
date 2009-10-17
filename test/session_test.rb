@@ -119,4 +119,10 @@ class SessionTest < Futile::TestCase
     path = Futile::Session.new("localhost:6666").full_path
     assert_equal "http://localhost:6666/", path
   end
+
+  def test_raises_on_status_500
+    assert_raises(Futile::RequestIsFutile) do
+      @futile.get("/500")
+    end
+  end
 end

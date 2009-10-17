@@ -79,6 +79,11 @@ module TestServer
     resp.body = parse_erb("scoped_links.erb")
   end
 
+  SERVER.mount_proc("/500") do |req, resp|
+    resp.status = 500
+    resp.body = "error 500"
+  end
+
   Thread.fork do
     SERVER.start
   end
