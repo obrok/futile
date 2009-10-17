@@ -73,7 +73,7 @@ class Futile::Session
     data = hash_to_params(opts[:data] || {})
     result = case method
              when GET
-               session.get("#{path}?#{data}", headers.merge(opts[:headers] || {}))
+               session.get("#{path}?#{data}", headers.merge(opts[:headers] || {}).merge({'cookie' => cookie_string}))
              when POST
                session.post(path, data)
              else
@@ -82,13 +82,14 @@ class Futile::Session
     @request_method = method
     @response = Futile::Response.new(result)
 
+    if response.error?
+      raise Futile::RequestIsFutile.new("Response was invalid (%d)" % [response.status])
+    end
+    process_cookies
     if response.redirect?
       follow_redirect
     else
       reset_state
-    end
-    if response.error?
-      raise Futile::RequestIsFutile.new("Response was invalid (%d)" % [response.status])
     end
     response
   end
@@ -242,5 +243,20 @@ class Futile::Session
       [*v].each {|element| params << "#{CGI.escape(k.to_s)}=#{CGI.escape(element.to_s)}"}
     end
     params.join('&')
+  end
+
+  def process_cookies
+    response.headers['set-cookie'].each do |cookie|
+      k,v = cookie.split('=')
+      cookies[k] = v
+    end if response.headers['set-cookie']
+  end
+
+  def cookie_string
+    cookies.map{|k,v| "#{k}=#{v}"}.join("\nCookie: ")
+  end
+
+  def cookies
+    @cookies ||= {}
   end
 end

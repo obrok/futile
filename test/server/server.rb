@@ -84,6 +84,22 @@ module TestServer
     resp.body = "error 500"
   end
 
+  SERVER.mount_proc("/set_cookie") do |req, resp|
+    req.query.each do |k, v|
+      v.each_data do |d|
+        resp.cookies << "#{k}=#{d}"
+      end
+    end
+  end
+
+  SERVER.mount_proc("/cookies") do |req, resp|
+    resp.body = "<html><body>\n"
+    req.cookies.each do |cookie|
+      resp.body << "#{cookie.name}:#{cookie.value}\n"
+    end
+    resp.body << "</body></html>"
+  end
+
   Thread.fork do
     SERVER.start
   end
