@@ -18,6 +18,18 @@ class HeadersTest < Futile::TestCase
     end
   end
 
+  def test_referer_sent
+    @futile.get("/simple_get")
+    @futile.click_link("referer")
+    assert_match(/simple_get/, @futile.response.body)
+  end
+
+  def test_referer_not_sent_if_typed_in_address
+    @futile.get("/request_headers")
+    headers = parse_response_headers(@futile.response.body)
+    assert ! headers.has_key?("referer")
+  end
+
   def test_changes_user_agent_header
     @futile.headers.browser = :safari3
     @futile.get("/request_headers")

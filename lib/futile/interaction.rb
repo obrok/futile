@@ -19,7 +19,7 @@ module Futile::Interaction
       @uri.fragment = href[1 .. -1]
       response
     else
-      get(href, {:headers => {'Referer' => @uri.to_s}})
+      get(href, {:headers => {Futile::Headers::REFERER => full_path}})
     end
   end
 

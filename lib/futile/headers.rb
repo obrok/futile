@@ -12,8 +12,9 @@ class Futile::Headers < Hash
   ACCEPT_CHARSET  = "accept-charset".freeze
   ACCEPT_ENCODING = "accept-encoding".freeze
   ACCEPT_LANGUAGE = "accept-language".freeze
-  KEEP_ALIVE      = "keep-alive".freeze
   CONNECTION      = "connection".freeze
+  KEEP_ALIVE      = "keep-alive".freeze
+  REFERER         = "referer".freeze
   USER_AGENT      = "user-agent".freeze
 
   REQUEST = {

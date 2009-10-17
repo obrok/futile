@@ -36,12 +36,6 @@ class SessionTest < Futile::TestCase
     assert session != @futile.send(:session)
   end
 
-  def test_referer_sent
-    @futile.get("/simple_get")
-    @futile.click_link("referer")
-    assert_match(/simple_get/, @futile.response.body)
-  end
-
   def test_following_redirect_parses_uri_as_usual
     @futile.get("/single_redirect")
     assert @futile.instance_variable_get(:@uri).is_a?(URI::HTTP)
