@@ -45,10 +45,6 @@ module TestServer
     resp.body = parse_erb("nested_path.erb")
   end
 
-  def self.content=(value)
-    @@content = value
-  end
-
   SERVER.mount_proc("/form") do |req, resp|
     resp.body = parse_erb("form.erb")
   end
@@ -90,6 +86,10 @@ module TestServer
         resp.cookies << "#{k}=#{d}"
       end
     end
+  end
+
+  SERVER.mount_proc("/form_header") do |req, resp|
+    resp.body = parse_erb("form_header.erb")
   end
 
   SERVER.mount_proc("/cookies") do |req, resp|
