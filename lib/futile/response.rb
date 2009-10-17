@@ -1,11 +1,15 @@
+require 'stringio'
+require 'zlib'
+
 class Futile::Response
   attr_reader :status # Returns Fixnum representing status of the response.
   attr_reader :headers # Returns Hash of headers sent with this response.
 
   def initialize(response)
-    @body = response.body
     @status = response.code.to_i
     @headers = response.each_header { |_, _| }
+    @body = extract_body(response.body, *headers[Futile::Headers::CONTENT_ENCODING])
+    @status = response.code.to_i
   end
 
   ##
@@ -43,5 +47,20 @@ class Futile::Response
 
   def original_parsed_body
     @original_parsed_body ||= Nokogiri.parse(@body)
+  end
+
+  private
+  def extract_body(body, encoding)
+    if encoding.nil?
+      body
+    elsif encoding == "gzip"
+      gunzip(body)
+    else
+      raise Futile::ResistanceIsFutile.new("Unknown encoding '%s'" % [encoding])
+    end
+  end
+
+  def gunzip(body)
+    Zlib::GzipReader.new(StringIO.new(body)).read
   end
 end

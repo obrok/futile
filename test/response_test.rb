@@ -21,4 +21,15 @@ class ResponseTest < Futile::TestCase
       assert @futile.response.instance_variable_get(var).class.name !~ /nokogiri/i
     end
   end
+
+  def test_gzipped_response
+    @futile.get("/gzipped_page")
+    assert_include("gzipped body", @futile.response.body)
+  end
+
+  def test_raises_on_unknown_encoding
+    assert_raises(Futile::ResistanceIsFutile) do
+      @futile.get("/unknown_encoding")
+    end
+  end
 end

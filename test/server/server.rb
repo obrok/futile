@@ -100,6 +100,15 @@ module TestServer
     resp.body << "</body></html>"
   end
 
+  SERVER.mount_proc("/gzipped_page") do |req, resp|
+    resp.body = File.read(File.join("test", "server", "gzipped_response.html.gz"))
+    resp["content-encoding"] = "gzip"
+  end
+
+  SERVER.mount_proc("/unknown_encoding") do |req, resp|
+    resp["content-encoding"] = "nopez"
+  end
+
   Thread.fork do
     SERVER.start
   end
