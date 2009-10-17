@@ -37,7 +37,11 @@ class Futile::Session
   # @param [Hash] opts Same as opts for {Session#request}
   # @return [Futile::Response] response from the server to the request
   def get(uri, opts={})
-    request(uri, {:method => GET, :headers => opts[:headers]})
+    request(uri, opts.merge({:method => GET}))
+  end
+
+  def post(uri, opts={})
+    request(uri, opts.merge({:method => POST}))
   end
 
   # Performs a request on _uri_
@@ -56,17 +60,21 @@ class Futile::Session
   # @return [Futile::Response] response from the server to the request
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
   def request(uri, opts={})
+    unsupported = opts.keys - [:method, :headers, :data]
+    raise Futile::OptionIsFutile.new("The following options are unsupported: #{unsupported.join(" ")}") unless unsupported.empty?
+
     @uri = process_uri(uri)
     if session_changed?
       disconnect
       @session = Net::HTTP.start(@uri.host, @uri.port)
     end
     method = opts[:method].upcase
+    data = hash_to_params(opts[:data] || {})
     result = case method
              when GET
-               session.get(path, headers.merge(opts[:headers] || {}))
+               session.get("#{path}?#{data}", headers.merge(opts[:headers] || {}))
              when POST
-               session.post(path, hash_to_params(opts[:data] || {}))
+               session.post(path, data)
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end

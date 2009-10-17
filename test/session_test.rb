@@ -125,4 +125,16 @@ class SessionTest < Futile::TestCase
     path = Futile::Session.new("localhost:6666").full_path
     assert_equal "http://localhost:6666/", path
   end
+
+  def test_get_data
+    @futile.get("/doit", {:data => {:a => :b}})
+    assert_match(/a:b/, @futile.response.body)
+  end
+
+  [:get, :post, :request].each do |method|
+    define_method "test_usupported_options_#{method}" do
+      opts = {:there_is_no_such_option => :some_value}
+      assert_raises(Futile::OptionIsFutile){@futile.send(method, "/simple_get", opts)}
+    end
+  end
 end

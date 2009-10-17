@@ -35,3 +35,8 @@ end
 # Raised when selecting a disabled option
 class Futile::SelectIsFutile < Futile::ResistanceIsFutile
 end
+
+##
+# Raised when an unsupported option is passed to a method
+class Futile::OptionIsFutile < Futile::ResistanceIsFutile
+end
