@@ -62,7 +62,7 @@ class Futile::Session
       disconnect
       @session = Net::HTTP.start(@uri.host, @uri.port)
     end
-    method = opts[:method].upcase
+    method = opts[:method].to_s.upcase
     result = case method
              when GET
                session.get(path, headers.merge(opts[:headers] || {}))

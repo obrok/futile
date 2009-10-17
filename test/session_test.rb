@@ -125,4 +125,9 @@ class SessionTest < Futile::TestCase
       @futile.get("/500")
     end
   end
+
+  def test_request_uses_to_s_on_method
+    @futile.request("/simple_get", {:method => :get})
+    assert_equal 200, @futile.response.status
+  end
 end
