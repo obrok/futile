@@ -83,6 +83,15 @@ class HeadersTest < Futile::TestCase
     assert headers.empty?
   end
 
+  def test_cannot_modify_headers_constant
+    Futile::Headers::REQUEST.each do |browser, headers|
+      headers.each do |header, value|
+        assert_raises(TypeError) { header.reverse! }
+        assert_raises(TypeError, "Header '%s' in browser '%s' can be modified" % [header, browser]) { value.reverse! }
+      end
+    end
+  end
+
   private
   def parse_response_headers(body)
     headers_params = body.split("\n")[1..-2]

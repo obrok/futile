@@ -19,21 +19,21 @@ class Futile::Headers < Hash
   REQUEST = {
     :firefox3 =>
     {
-      ACCEPT          => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      ACCEPT_CHARSET  => "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
-      ACCEPT_ENCODING => "gzip,deflate",
-      ACCEPT_LANGUAGE => "en-us,en;q=0.5",
-      CONNECTION      => "keep-alive",
-      KEEP_ALIVE      => "300",
-      USER_AGENT      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3",
+      ACCEPT          => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8".freeze,
+      ACCEPT_CHARSET  => "ISO-8859-1,utf-8;q=0.7,*;q=0.7".freeze,
+      ACCEPT_ENCODING => "gzip,deflate".freeze,
+      ACCEPT_LANGUAGE => "en-us,en;q=0.5".freeze,
+      CONNECTION      => "keep-alive".freeze,
+      KEEP_ALIVE      => "300".freeze,
+      USER_AGENT      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3".freeze,
     },
     :safari3 =>
     {
-      ACCEPT          => "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
-      ACCEPT_ENCODING => "gzip, deflate",
-      ACCEPT_LANGUAGE => "en-us",
-      CONNECTION      => "keep-alive",
-      USER_AGENT      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_1; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9",
+      ACCEPT          => "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5".freeze,
+      ACCEPT_ENCODING => "gzip, deflate".freeze,
+      ACCEPT_LANGUAGE => "en-us".freeze,
+      CONNECTION      => "keep-alive".freeze,
+      USER_AGENT      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_1; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9".freeze,
     }
   }.freeze
 
