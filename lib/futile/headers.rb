@@ -38,17 +38,64 @@ class Futile::Headers < Hash
   }.freeze
 
   ##
+  # Creates headers object with browser set to _default_browser_.
+  def initialize(default_browser)
+    super()
+    self.browser = default_browser
+  end
+
+  ##
+  # Returns the current browser (most recent set with {#browser=})
+  #
+  # @example
+  #   headers.current_browser #=> :firefox3
+  # @return [Symbol] recent browser
+  def current_browser
+    @_current_browser
+  end
+
+  ##
+  # Reset request headers to the most recent browser.
+  #
+  # @example
+  #   headers.browser = :firefox3
+  #   headers["keep-alive"] #=> 300
+  #   headers["keep-alive"] = 150
+  #   headers.reset
+  #   headers["keep-alive"] #=> 300
+  # @return [Symbol] browser which was reset
+  def reset
+    self.browser = current_browser
+  end
+
+  ##
+  # Clears headers (removes them completely). You will probably need to set them
+  # again with {#browser=}.
+  #
+  # @example Clears the request headers
+  #   headers["accept"] #=> "*.*"
+  #   headers.clear
+  #   headers["accept"] #=> nil
+  def clear
+    super
+  end
+
+  ##
   # Sets request headers for specific _browser_. Available browsers can be
   # obtained with Futile::Headers::REQUEST.keys.
   # @example Set headers for Safari 3
   #   headers.browser = :safari3
+  # @return [Symbol] browser which was set
   # @raise [Futile::ResistanceIsFutile] raised when browser is not found
   def browser=(browser)
-    headers = REQUEST[browser]
+    clear
+    @_current_browser = browser
+    headers = REQUEST[current_browser]
     unless headers
-      msg = "Browser '%s' not found. Available browsers: %s" % [browser, REQUEST.keys.join(", ")]
+      msg = "Browser '%s' not found. Available browsers: %s" % [current_browser, REQUEST.keys.join(", ")]
       raise Futile::ResistanceIsFutile.new(msg)
     end
     merge!(headers.dup)
+    current_browser
   end
 end

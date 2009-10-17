@@ -23,7 +23,6 @@ class HeadersTest < Futile::TestCase
     @futile.get("/request_headers")
     headers = parse_response_headers(@futile.response.body)
     assert_header(headers, "user-agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_1; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9")
-    
   end
 
   def test_raises_when_browser_not_found
@@ -44,6 +43,44 @@ class HeadersTest < Futile::TestCase
       @futile.headers
     end
     assert_include "just_to_check", exception.message
+  end
+
+  def test_initialize_set_browser
+    headers = Futile::Headers.new(:safari3)
+    assert_equal :safari3, headers.current_browser
+  end
+
+  def test_raises_at_init_when_browser_not_found
+    assert_raises(Futile::ResistanceIsFutile) do
+      Futile::Headers.new(:not_found_browser)
+    end
+  end
+
+  def test_resets_headers
+    headers = Futile::Headers.new(:firefox3)
+    keep_alive = headers["keep-alive"]
+    new_keep_alive = (keep_alive.to_i + 100).to_s
+    headers["keep-alive"] = new_keep_alive
+    headers.reset
+    assert_equal keep_alive, headers["keep-alive"]
+  end
+
+  def test_headers_are_cleaned_before_setting_browser
+    headers = Futile::Headers.new(:firefox3)
+    assert headers.has_key?("keep-alive")
+    headers.browser = :safari3
+    assert ! headers.has_key?("keep-alive")
+  end
+
+  def test_reset_returns_symbol_of_current_browser
+    assert_equal :safari3, Futile::Headers.new(:safari3).reset
+  end
+
+  def test_clear_makes_empty_headers
+    headers = Futile::Headers.new(:firefox3)
+    assert ! headers.empty?
+    headers.clear
+    assert headers.empty?
   end
 
   private

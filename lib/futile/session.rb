@@ -161,11 +161,7 @@ class Futile::Session
   #
   # @return [Futile::Headers] request headers
   def headers
-    unless @_headers
-      @_headers = Futile::Headers.new
-      @_headers.browser = @default_browser
-    end
-    @_headers
+    @_headers ||= Futile::Headers.new(@default_browser)
   end
 
   private
