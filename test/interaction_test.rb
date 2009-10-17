@@ -130,9 +130,9 @@ class HelpersTest < Futile::TestCase
     assert_nil @futile.response.parsed_body.at("#id6")["checked"]
   end
 
-  [/p1:init value/, /p5:Initial value/, /button:submit post/, /p8:on/, 
-   /p10:radio value 2/, /p12:on/, /p13:selected/, /p14:selected1/,
-   /p14:selected2/].each do |regex|
+  [/p1:init value/, /p5:Initial value/, /button:submit post/, /p8:on/,
+     /p10:radio value 2/, /p12:on/, /p13:selected/, /p14:selected1/,
+     /p14:selected2/].each do |regex|
     define_method("test_submit_#{regex.to_s.gsub(' ', '_')}") do
       @futile.get("/form")
       @futile.click_button("submit post")

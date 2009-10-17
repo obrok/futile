@@ -19,11 +19,14 @@ class Futile::Session
   # @param [String, URI] path the web page address to test / uri object
   # @param [Hash] opts override default options
   # @option opts [Fixnum] :max_redirects (10) Number of redirects considered to be
-  #  infinite
+  #   infinite
+  # @option opts [Symbol] :default_browser (:firefox3) Browser-specific request
+  #   headers
   def initialize(path, opts = {})
     @uri = process_uri(path)
     @session = Net::HTTP.start(@uri.host, @uri.port)
     @max_redirects = opts[:max_redirects] || 10
+    @default_browser = opts[:default_browser] || :firefox3
     reset_state
   end
 
@@ -61,7 +64,7 @@ class Futile::Session
     method = opts[:method].upcase
     result = case method
              when GET
-               session.get(path, opts[:headers])
+               session.get(path, headers.merge(opts[:headers] || {}))
              when POST
                session.post(path, hash_to_params(opts[:data] || {}))
              else
@@ -153,6 +156,14 @@ class Futile::Session
     end
   end
 
+  ##
+  # Hash of headers sent with next request.
+  #
+  # @return [Futile::Headers] request headers
+  def headers
+    @_headers ||= Futile::Headers.new(@default_browser)
+  end
+
   private
   def session
     @session
@@ -176,9 +187,11 @@ class Futile::Session
     @no_redirects = 0
   end
 
-  def process_uri(uri)
-    uri = URI.parse(uri.to_s)
-    if uri.is_a?(URI::Generic) # relative path
+  def process_uri(path)
+    uri = URI.parse(path.to_s)
+    unless uri.is_a?(URI::HTTP) # relative path
+      # here we handle the case when user inits the session without http scheme
+      uri = URI.parse("http://%s" % [path.to_s]) unless @uri
       if uri.to_s[0, 1] != "/" # relative to last folder
         base = File.dirname(@uri.path) rescue ""
         uri.path = File.join(base, uri.path).squeeze("/")

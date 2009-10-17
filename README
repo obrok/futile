@@ -10,6 +10,33 @@ works. They don't care wether your #authorize method returns instance of user or
 an integer. They don't give a damn about it! They want to see the page, type in
 their login/password and see their profile. That's it. Easy as it sounds.
 
+== What is wrong with <your framework here> functional tests
+Imagine you have a registration form. It is very simple, includes login and two
+password fields (one real and one to confirm). Within Rails you might do
+something like this:
+ def test_registers
+   assert_difference(User, :count) do
+     post(register_user_path,
+            {:user => {:login => "msq", :password => "test",
+               :password_confirmation => "test"}})
+   end
+   # more assertions here...
+ end
+The test passes, you are happy.
+Now go to your registration form and change the name of login field to :log_in.
+The test passes again. But the registration is not working! User is unable to
+register which seems to be a serious bug.
+
+Also the #register_user_path method might be considered wrong. Remember that
+users type in your page address and it's probably the last thing they type into
+address bar -- unless they are *leaving* your page. The rest happens through <a>
+and <button>/<input> interface!
+
+This proves the main flaw of built-in functional tests for frameworks -- they
+don't test views. They do render them but nothing more. Remember -- view is the
+*only* interface endusers see when they visit your webpage. They only click
+links, fill fields and that's it!
+
 = Installation
  $ sudo gem install futile
 
