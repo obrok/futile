@@ -14,6 +14,18 @@ class SessionTest < Futile::TestCase
     assert @futile.redirected?
   end
 
+  def test_redirected_is_true_when_single_redirect
+    @futile.get("/single_redirect")
+    assert @futile.redirected?
+  end
+
+  def test_simple_get_after_redirection_is_not_redirection
+    @futile.get("/single_redirect")
+    assert @futile.redirected?
+    @futile.get("/simple_get")
+    assert ! @futile.redirected?
+  end
+
   def test_process_uri_builds_simple_uri
     uri = @futile.send(:process_uri, "/msq#test")
     assert_include "msq#test", uri.to_s

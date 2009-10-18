@@ -1,3 +1,5 @@
+require 'benchmark'
+
 ##
 # This class is the base class which is used to perform requests.
 class Futile::Session
@@ -23,11 +25,11 @@ class Futile::Session
   # @option opts [Symbol] :default_browser (:firefox3) Browser-specific request
   #   headers
   def initialize(path, opts = {})
+    assert_opts(opts, [:max_redirects, :default_browser])
     @uri = process_uri(path)
     @session = Net::HTTP.start(@uri.host, @uri.port)
     @max_redirects = opts[:max_redirects] || 10
     @default_browser = opts[:default_browser] || :firefox3
-    reset_state
   end
 
   ##
@@ -61,8 +63,8 @@ class Futile::Session
   # @raise [Futile::RedirectIsFutile] when infinite redirection is encountered
   # @raise [Futile::RequestIsFutile] when response status code is 5xx
   def request(uri, opts={})
-    unsupported = opts.keys - [:method, :headers, :data]
-    raise Futile::OptionIsFutile.new("The following options are unsupported: #{unsupported.join(" ")}") unless unsupported.empty?
+    assert_opts(opts, [:method, :headers, :data, :_redirect_no])
+    reset_state(:_redirect_no => opts[:_redirect_no] || 0)
 
     @uri = process_uri(uri)
     if session_changed?
@@ -86,11 +88,7 @@ class Futile::Session
       raise Futile::RequestIsFutile.new("Response was invalid (%d)" % [response.status])
     end
     process_cookies
-    if response.redirect?
-      follow_redirect
-    else
-      reset_state
-    end
+    follow_redirect if response.redirect?
     response
   end
 
@@ -192,11 +190,12 @@ class Futile::Session
   def follow_redirect
     raise Futile::RedirectIsFutile.new("Infinite redirect for %p" % @uri) if infinite_redirect?
     @no_redirects += 1
-    get(response.headers["location"].first)
+    get(response.headers["location"].first, {:_redirect_no => @no_redirects})
   end
 
-  def reset_state
-    @no_redirects = 0
+  def reset_state(opts = {})
+    assert_opts(opts, [:_redirect_no])
+    @no_redirects = opts[:_redirect_no]
   end
 
   def process_uri(path)
@@ -258,5 +257,12 @@ class Futile::Session
 
   def cookies
     @cookies ||= {}
+  end
+
+  def assert_opts(opts, valid_keys)
+    unsupported = opts.keys - valid_keys
+    unless unsupported.empty?
+      raise Futile::OptionIsFutile.new("The following options are unsupported: #{unsupported.join(", ")}")
+    end
   end
 end
