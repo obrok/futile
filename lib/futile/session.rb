@@ -258,5 +258,6 @@ class Futile::Session
 
   def cookies
     @cookies ||= {}
+    @cookies[@uri.host] ||= {}
   end
 end

@@ -12,4 +12,10 @@ class CookiesTest < Futile::TestCase
     assert_match(/a:b/, @futile.response.body)
     assert_match(/c:d/, @futile.response.body)
   end
+
+  def test_cookies_per_hostname
+    @futile.post("/set_cookie", {:data => {'a' => 'b'}})
+    @futile.get("http://127.0.0.1:6666/cookies")
+    assert_no_match(/a:b/, @futile.response.body)
+  end
 end
