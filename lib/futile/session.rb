@@ -247,17 +247,17 @@ class Futile::Session
 
   def process_cookies
     response.headers['set-cookie'].each do |cookie|
-      k,v = cookie.split('=')
-      cookies[k] = v
+      cookies << Futile::Cookie.parse(cookie)
     end if response.headers['set-cookie']
   end
 
   def cookie_string
-    cookies.map{|k,v| "#{k}=#{v}"}.join("\nCookie: ")
+    cookies.map{|x| "#{x.name}=#{x.value}"}.join("\nCookie: ")
   end
 
   def cookies
     @cookies ||= {}
-    @cookies[@uri.host] ||= {}
+    @cookies[@uri.host] ||= []
+    @cookies[@uri.host] = @cookies[@uri.host].select{|x| !x.expired?}
   end
 end

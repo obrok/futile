@@ -1,4 +1,6 @@
+require 'rubygems'
 require 'test/unit'
+require 'mocha'
 require File.join("lib", "futile")
 require File.join("test", "server", "server")
 
