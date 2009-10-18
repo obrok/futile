@@ -45,10 +45,6 @@ module TestServer
     resp.body = parse_erb("nested_path.erb")
   end
 
-  def self.content=(value)
-    @@content = value
-  end
-
   SERVER.mount_proc("/form") do |req, resp|
     resp.body = parse_erb("form.erb")
   end
@@ -92,12 +88,25 @@ module TestServer
     end
   end
 
+  SERVER.mount_proc("/form_header") do |req, resp|
+    resp.body = parse_erb("form_header.erb")
+  end
+
   SERVER.mount_proc("/cookies") do |req, resp|
     resp.body = "<html><body>\n"
     req.cookies.each do |cookie|
       resp.body << "#{cookie.name}:#{cookie.value}\n"
     end
     resp.body << "</body></html>"
+  end
+
+  SERVER.mount_proc("/gzipped_page") do |req, resp|
+    resp.body = File.read(File.join("test", "server", "gzipped_response.html.gz"))
+    resp["content-encoding"] = "gzip"
+  end
+
+  SERVER.mount_proc("/unknown_encoding") do |req, resp|
+    resp["content-encoding"] = "nopez"
   end
 
   Thread.fork do

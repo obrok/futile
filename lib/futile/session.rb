@@ -75,7 +75,7 @@ class Futile::Session
              when GET
                session.get("#{path}?#{data}", headers.merge(opts[:headers] || {}).merge({'cookie' => cookie_string}))
              when POST
-               session.post(path, data)
+               session.post(path, data, headers.merge(opts[:headers] || {}))
              else
                raise Futile::ResistanceIsFutile.new("Unknown request method '%s'" % [method])
              end

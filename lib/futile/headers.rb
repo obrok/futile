@@ -8,14 +8,15 @@
 # @example Setting specific header
 #   headers[Futile::Headers::ACCEPT] = "*.*" # accept everything
 class Futile::Headers < Hash
-  ACCEPT          = "accept".freeze
-  ACCEPT_CHARSET  = "accept-charset".freeze
-  ACCEPT_ENCODING = "accept-encoding".freeze
-  ACCEPT_LANGUAGE = "accept-language".freeze
-  CONNECTION      = "connection".freeze
-  KEEP_ALIVE      = "keep-alive".freeze
-  REFERER         = "referer".freeze
-  USER_AGENT      = "user-agent".freeze
+  ACCEPT           = "accept".freeze
+  ACCEPT_CHARSET   = "accept-charset".freeze
+  ACCEPT_ENCODING  = "accept-encoding".freeze
+  ACCEPT_LANGUAGE  = "accept-language".freeze
+  CONNECTION       = "connection".freeze
+  CONTENT_ENCODING = "content-encoding".freeze
+  KEEP_ALIVE       = "keep-alive".freeze
+  REFERER          = "referer".freeze
+  USER_AGENT       = "user-agent".freeze
 
   REQUEST = {
     :firefox3 =>
