@@ -70,6 +70,8 @@ class Futile::Session
     if session_changed?
       disconnect
       @session = Net::HTTP.start(@uri.host, @uri.port)
+    elsif reconnect_needed?
+      reconnect
     end
     method = opts[:method].to_s.upcase
     data = hash_to_params(opts[:data] || {})
@@ -181,6 +183,16 @@ class Futile::Session
 
   def session_changed?
     (@session.address != @uri.host) or (@session.port != @uri.port)
+  end
+
+  def reconnect_needed?
+    conn = response.headers["connection"].first rescue nil
+    return ! [nil, "close"].include?(conn)
+  end
+
+  def reconnect
+    disconnect
+    session.start
   end
 
   def infinite_redirect?

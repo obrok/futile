@@ -154,4 +154,18 @@ class SessionTest < Futile::TestCase
       assert_raises(Futile::OptionIsFutile){@futile.send(method, "/simple_get", opts)}
     end
   end
+
+  def test_reconnect_needed_if_keep_alive
+    @futile.headers["connection"] = "keep-alive"
+    @futile.get("/simple_get")
+    assert_equal "keep-alive", @futile.response.headers["connection"].first.downcase
+    assert @futile.send(:reconnect_needed?)
+  end
+
+  def test_reconnect_not_needed_if_close_connection
+    @futile.headers["connection"] = "close"
+    @futile.get("/simple_get")
+    assert_equal "close", @futile.response.headers["connection"].first.downcase
+    assert ! @futile.send(:reconnect_needed?)
+  end
 end
