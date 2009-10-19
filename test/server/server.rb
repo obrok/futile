@@ -92,12 +92,12 @@ module TestServer
     resp.body = parse_erb("form_header.erb")
   end
 
-  SERVER.mount_proc("/cookies") do |req, resp|
-    resp.body = "<html><body>\n"
-    req.cookies.each do |cookie|
-      resp.body << "#{cookie.name}:#{cookie.value}\n"
-    end
-    resp.body << "</body></html>"
+  SERVER.mount_proc("/show/cookies") do |req, resp|
+    show_cookies(req, resp)
+  end
+
+  SERVER.mount_proc("/show") do |req, resp|
+    show_cookies(req, resp)
   end
 
   SERVER.mount_proc("/gzipped_page") do |req, resp|
@@ -111,5 +111,14 @@ module TestServer
 
   Thread.fork do
     SERVER.start
+  end
+
+  private
+  def self.show_cookies(req, resp)
+    resp.body = "<html><body>\n"
+    req.cookies.each do |cookie|
+      resp.body << "#{cookie.name}:#{cookie.value}\n"
+    end
+    resp.body << "</body></html>"
   end
 end
