@@ -260,7 +260,7 @@ class Futile::Session
   def process_cookies
     response.headers['set-cookie'].each do |cookie|
       cookie = Futile::Cookie.parse(cookie, @uri.host)
-      @cookies[cookie.domain] ||= Futile::CookieTree.new
+      @cookies[cookie.domain] ||= Futile::CookieStore.new
       @cookies[cookie.domain].insert(cookie)
     end if response.headers['set-cookie']
   end
@@ -270,7 +270,7 @@ class Futile::Session
   end
 
   def cookies
-    @cookies[@uri.host] ||= Futile::CookieTree.new
+    @cookies[@uri.host] ||= Futile::CookieStore.new
     @cookies[@uri.host].cookies(@uri.path)
   end
 

@@ -2,15 +2,18 @@ module Futile
   class Cookie
     attr_accessor :name, :value, :expires, :path, :domain
 
-    def initialize(domain)
-      self.path = "/"
-      self.domain = domain
-    end
-
+    ##
+    # Test if this Cookie has expired.
     def expired?
-      expires && expires < Time.now
+      !!(expires && expires < Time.now)
     end
 
+    ##
+    # Parses a cookie from a string.
+    #
+    # @param [String] cookie_string The textual representation of the cookie.
+    # @param [String] domain The cookie's domain will be set to this if the
+    #   cookie_string doesn't contain a domain field.
     def self.parse(cookie_string, domain)
       cookie = Cookie.new(domain)
       fields = cookie_string.split(";")
@@ -31,6 +34,12 @@ module Futile
         end
       end
       cookie
+    end
+
+    protected
+    def initialize(domain)
+      self.path = "/"
+      self.domain = domain
     end
   end
 end
