@@ -43,7 +43,7 @@ class WebServer
   end
 
   def redirect(from, to, permanent = false)
-    mount_text("You are being redirected...", from) do |request, response|
+    mount_text("You are being <a href=\"%s\">redirected</a>..." % [to], from) do |request, response|
       response.status = permanent ? 301 : 302
       response["Location"] = to
     end
@@ -107,17 +107,16 @@ end
 
 server = WebServer.new
 server.automount
-# server.mount("/500", "simple_html.html.erb") { |_, response| response.status = 500 }
-# server.mount("/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
-# server.mount("/gzipped_page", "gzipped_response.html.gz") { |_, response| response["content-encoding"] = "gzip" }
-# server.mount("/set_cookie") do |req, resp|
-  # req.query.each do |k, v|
-    # v.each_data do |d|
-      # resp.cookies << "#{k}=#{d}"
-    # end
-  # end
-# end
+server.mount_text("500 error", "/500") { |_, response| response.status = 500 }
+server.mount_text("enc", "/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
+server.mount_text("", "/set_cookie") do |req, resp|
+  req.query.each do |k, v|
+    v.each_data do |d|
+      resp.cookies << "#{k}=#{d}"
+    end
+  end
+end
 server.redirect("/infinite_redirect", "/infinite_redirect")
-server.redirect("/single_redirect", "/simple_get")
+server.redirect("/single_redirect", "/simple_html.html")
 
 server.start

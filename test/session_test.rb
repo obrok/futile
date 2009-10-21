@@ -2,9 +2,10 @@ require File.join("test", "test_helper")
 
 class SessionTest < Futile::TestCase
   def test_basic_get
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
+    assert_equal 200, @futile.response.status
     assert ! @futile.redirected?
-    assert_equal "/simple_get", @futile.path
+    assert_equal "/simple_html.html", @futile.path
   end
 
   def test_infinite_redirect
@@ -32,7 +33,7 @@ class SessionTest < Futile::TestCase
   end
 
   def test_process_uri_merges_relative_uri
-    uri = @futile.send(:process_uri, "http://0.0.0.0:6666/doit")
+    uri = @futile.send(:process_uri, "http://0.0.0.0:6666/doit.html")
     assert_include "0.0.0.0:6666", uri.to_s
   end
 
@@ -44,7 +45,7 @@ class SessionTest < Futile::TestCase
 
   def test_session_changed
     session = @futile.send(:session)
-    @futile.get("http://0.0.0.0:6666/form")
+    @futile.get("http://0.0.0.0:6666/form.html")
     assert session != @futile.send(:session)
   end
 
@@ -54,24 +55,25 @@ class SessionTest < Futile::TestCase
   end
 
   def test_post_method
-    @futile.request("/doit", {:method => Futile::Session::POST})
+    @futile.request("/doit.html", {:method => Futile::Session::POST})
+    assert_equal 200, @futile.response.status
     assert @futile.post?
   end
 
   def test_scoped_links
-    @futile.get("/scoped_links")
+    @futile.get("/scoped_links.html")
     assert_raises(Futile::SearchIsFutile) do
       @futile.click_link("one")
     end
     @futile.within("#scope1") do
       @futile.click_link("one")
-      assert @futile.path =~ /simple_get/
+      assert @futile.path =~ /simple_html\.html/
     end
-    assert_equal "/simple_get", @futile.path
+    assert_equal "/simple_html.html", @futile.path
   end
 
   def test_scoped_form
-    @futile.get("/scoped_links")
+    @futile.get("/scoped_links.html")
     parsed = @futile.response.parsed_body.dup
     assert_raises(Futile::SearchIsFutile) do
       @futile.click_link("one")
@@ -80,11 +82,11 @@ class SessionTest < Futile::TestCase
       @futile.click_button("Click")
       assert @futile.path =~ /form_without_method/
     end
-    assert_equal "/form_without_method", @futile.path
+    assert_equal "/form_without_method.html", @futile.path
   end
 
   def test_scoped_doesnt_change_body_when_no_request
-    @futile.get("/scoped_links")
+    @futile.get("/scoped_links.html")
     parsed = @futile.response.parsed_body.dup
     @futile.within("#scope2") do
       # nothing
@@ -93,7 +95,7 @@ class SessionTest < Futile::TestCase
   end
 
   def test_scoped_raises_when_scope_not_found
-    @futile.get("/scoped_links")
+    @futile.get("/scoped_links.html")
     parsed = @futile.response.parsed_body.dup
     assert_raises(Futile::SearchIsFutile) do
       @futile.within("#scope_not_existing") do
@@ -102,7 +104,7 @@ class SessionTest < Futile::TestCase
   end
 
   def test_double_within
-    @futile.get("/scoped_links")
+    @futile.get("/scoped_links.html")
     @futile.within("#scope3") do
       @futile.click_link("destiny")
       @futile.within("//div[@id='scope3']/div[1]") do
@@ -117,7 +119,7 @@ class SessionTest < Futile::TestCase
 
   def test_redirection_sets_correct_uri
     @futile.get("/single_redirect")
-    assert_equal "/simple_get", @futile.path
+    assert_equal "/simple_html.html", @futile.path
   end
 
   def test_get_post_consts_are_frozen
@@ -137,32 +139,32 @@ class SessionTest < Futile::TestCase
   end
 
   def test_request_uses_to_s_on_method
-    @futile.request("/simple_get", {:method => :get})
+    @futile.request("/simple_html.html", {:method => :get})
     assert_equal 200, @futile.response.status
   end
 
   def test_get_data
-    @futile.get("/doit", {:data => {:a => :b}})
+    @futile.get("/doit.html", {:data => {:a => :b}})
     assert_match(/a:b/, @futile.response.body)
   end
 
   [:get, :post, :request].each do |method|
     define_method "test_usupported_options_#{method}" do
       opts = {:there_is_no_such_option => :some_value}
-      assert_raises(Futile::OptionIsFutile){@futile.send(method, "/simple_get", opts)}
+      assert_raises(Futile::OptionIsFutile){@futile.send(method, "/simple_html.html", opts)}
     end
   end
 
   def test_reconnect_needed_if_keep_alive
     @futile.headers["connection"] = "keep-alive"
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
     assert_equal "keep-alive", @futile.response.headers["connection"].first.downcase
     assert @futile.send(:reconnect_needed?)
   end
 
   def test_reconnect_not_needed_if_close_connection
     @futile.headers["connection"] = "close"
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
     assert_equal "close", @futile.response.headers["connection"].first.downcase
     assert ! @futile.send(:reconnect_needed?)
   end
