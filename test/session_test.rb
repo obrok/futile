@@ -67,8 +67,7 @@ class SessionTest < Futile::TestCase
       @futile.click_link("one")
       assert @futile.path =~ /simple_get/
     end
-    assert_equal(Nokogiri.parse(TestServer.parse_erb("simple_html.erb")).to_s,
-      @futile.response.parsed_body.to_s)
+    assert_equal "/simple_get", @futile.path
   end
 
   def test_scoped_form
@@ -81,8 +80,7 @@ class SessionTest < Futile::TestCase
       @futile.click_button("Click")
       assert @futile.path =~ /form_without_method/
     end
-    assert_equal(Nokogiri.parse(TestServer.parse_erb("form_without_method.erb")).to_s,
-      @futile.response.parsed_body.to_s)
+    assert_equal "/form_without_method", @futile.path
   end
 
   def test_scoped_doesnt_change_body_when_no_request

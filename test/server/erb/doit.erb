@@ -1,0 +1,6 @@
+<%= @request.request_method %>
+<% @request.query.each do |k, v| %>
+  <% v.each_data do |d| %>
+    <%= "#{k}:#{d}" %>
+  <% end %>
+<% end %>

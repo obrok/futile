@@ -1,0 +1,3 @@
+<% @request.header.each do |key, value| %>
+  <%= "%s => %s" % [key.downcase, value] %>
+<% end %>

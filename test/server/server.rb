@@ -2,114 +2,79 @@ require "rubygems"
 require "erb"
 require "webrick"
 
-include WEBrick
-module TestServer
-  def self.parse_erb(path, context = {})
-    erb = ERB.new(File.read("test/server/%s" % [path]))
-    context.each { |k, v| eval("%s = %s" % [k, v]) }
-    erb.result(binding)
+class WebServer
+  attr_reader :server
+
+  def initialize(port = 6666)
+    @server = WEBrick::HTTPServer.new(
+      {:Port => port,
+        :Logger => WEBrick::Log.new(nil, WEBrick::BasicLog::WARN),
+        :AccessLog => [],
+    })
+    ["INT", "TERM"].each { |signal| trap(signal) { server.shutdown } }
+    mount("/favicon.ico") { }
   end
 
-  SERVER = HTTPServer.new({:Port => 6666,
-                           :Logger => Log.new(nil, BasicLog::WARN),
-                           :AccessLog => [],
-                          })
-
-  ["INT", "TERM"].each { |signal|
-    trap(signal) { SERVER.shutdown }
-  }
-
-  SERVER.mount_proc("/simple_get") do |req, resp|
-    resp.body = parse_erb("simple_html.erb")
-  end
-
-  SERVER.mount_proc("/second_page") do |req, resp|
-    resp.body = parse_erb("second_page.erb")
-  end
-
-  SERVER.mount_proc("/infinite_redirect") do |req, resp|
-    resp["Location"] = "/infinite_redirect"
-    resp.status = 302
-  end
-
-  SERVER.mount_proc("/single_redirect") do |req, resp|
-    resp["Location"] = "/simple_get"
-    resp.status = 302
-  end
-
-  SERVER.mount_proc("/nested_path/index.html") do |req, resp|
-    resp.body = parse_erb("nested_path.erb")
-  end
-
-  SERVER.mount_proc("/nested_path/nested_in.html") do |req, resp|
-    resp.body = parse_erb("nested_path.erb")
-  end
-
-  SERVER.mount_proc("/form") do |req, resp|
-    resp.body = parse_erb("form.erb")
-  end
-
-  SERVER.mount_proc("/form_without_method") do |req, resp|
-    resp.body = parse_erb("form_without_method.erb")
-  end
-
-  SERVER.mount_proc("/doit") do |req, resp|
-    resp.body = "<html><body>" + req.request_method
-    req.query.each do |k, v|
-      v.each_data do |d|
-        resp.body += "\n#{k}:#{d}"
-      end
-    end
-    resp.body += "</body></html>"
-  end
-
-  SERVER.mount_proc("/request_headers") do |req, resp|
-    resp.body = "<html><body>\n"
-    req.header.each do |key, value|
-      resp.body << "%s => %s\n" % [key.downcase, value]
-    end
-    resp.body << "</body></html>"
-  end
-
-  SERVER.mount_proc("/scoped_links") do |req, resp|
-    resp.body = parse_erb("scoped_links.erb")
-  end
-
-  SERVER.mount_proc("/500") do |req, resp|
-    resp.status = 500
-    resp.body = "error 500"
-  end
-
-  SERVER.mount_proc("/set_cookie") do |req, resp|
-    req.query.each do |k, v|
-      v.each_data do |d|
-        resp.cookies << "#{k}=#{d}"
+  def page(path, content = nil, opts = {})
+    layout_name = opts[:layout] || "layout.erb"
+    mount(path) do |request, response|
+      @request, @response = request, response
+      yield request, response if block_given?
+      if content.nil?
+        # do nothing
+      elsif content[-3 .. -1] == "erb"
+        layout = ERB.new(File.read(File.join("test", "server", "erb", layout_name)))
+        erb = ERB.new(File.read(File.join("test", "server", "erb", content)))
+        @content = erb.result(binding)
+        response.body = layout.result(binding)
+      else
+        response.body = File.read(File.join("test", "server", content))
       end
     end
   end
 
-  SERVER.mount_proc("/form_header") do |req, resp|
-    resp.body = parse_erb("form_header.erb")
-  end
-
-  SERVER.mount_proc("/cookies") do |req, resp|
-    resp.body = "<html><body>\n"
-    req.cookies.each do |cookie|
-      resp.body << "#{cookie.name}:#{cookie.value}\n"
+  def redirect(from, to, permanent = false)
+    mount(from) do |request, response|
+      response.status = permanent ? 301 : 302
+      response["Location"] = to
     end
-    resp.body << "</body></html>"
   end
 
-  SERVER.mount_proc("/gzipped_page") do |req, resp|
-    resp.body = File.read(File.join("test", "server", "gzipped_response.html.gz"))
-    resp["content-encoding"] = "gzip"
+  def mount(path, &block)
+    server.mount_proc(path) do |request, response|
+      yield request, response
+    end
   end
 
-  SERVER.mount_proc("/unknown_encoding") do |req, resp|
-    resp["content-encoding"] = "nopez"
-  end
-
-  Thread.fork do
-    SERVER.start
+  def start
+    Thread.fork { server.start }
   end
 end
+
+server = WebServer.new
+server.page("/simple_get", "simple_html.erb")
+server.page("/second_page", "second_page.erb")
+server.page("/nested_path/index.html", "nested_path.erb")
+server.page("/nested_path/nested_in.html", "nested_path.erb")
+server.page("/form", "form.erb")
+server.page("/form_without_method", "form_without_method.erb")
+server.page("/scoped_links", "scoped_links.erb")
+server.page("/doit", "doit.erb")
+server.page("/scoped_links", "scoped_links.erb")
+server.page("/form_header", "form_header.erb")
+server.page("/request_headers", "request_headers.erb")
+server.page("/cookies", "cookies.erb")
+server.page("/500", "simple_html.erb") { |_, response| response.status = 500 }
+server.page("/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
+server.page("/gzipped_page", "gzipped_response.html.gz") { |_, response| response["content-encoding"] = "gzip" }
+server.page("/set_cookie") do |req, resp|
+  req.query.each do |k, v|
+    v.each_data do |d|
+      resp.cookies << "#{k}=#{d}"
+    end
+  end
+end
+server.redirect("/infinite_redirect", "/infinite_redirect")
+server.redirect("/single_redirect", "/simple_get")
+
+server.start

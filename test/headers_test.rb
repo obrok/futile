@@ -125,10 +125,10 @@ class HeadersTest < Futile::TestCase
 
   private
   def parse_response_headers(body)
-    headers_params = body.split("\n")[1..-2]
+    headers_params = body.split(/\n+/)[1..-2]
     headers = {}
     headers_params.each do |header|
-      name, value = header.split(" => ")
+      name, value = header.strip.split(" => ")
       headers[name] = value
     end
     headers
