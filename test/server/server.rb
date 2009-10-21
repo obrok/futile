@@ -12,45 +12,91 @@ class WebServer
         :AccessLog => [],
     })
     ["INT", "TERM"].each { |signal| trap(signal) { server.shutdown } }
-    mount("/favicon.ico") { }
-  end
-
-  def path_to(path)
-    File.join("test", "server", "root", path)
+    mount_text("", "favicon.ico")
   end
 
   def layout(name)
-    ERB.new(File.read(File.join("test", "server", "layouts", name)))
+    if name == false
+      ERB.new("<%= @content %>")
+    else
+      ERB.new(File.read(File.join("test", "server", "layouts", name)))
+    end
   end
 
-  def page(path, content = nil, opts = {})
-    layout_name = opts[:layout] || "layout.html.erb"
-    mount(path) do |request, response|
-      @request, @response = request, response
-      yield request, response if block_given?
-      if content.nil?
-        # do nothing
-      elsif content[-3 .. -1] == "erb"
-        layout = layout(layout_name)
-        erb = ERB.new(File.read(path_to(content)))
-        @content = erb.result(binding)
-        response.body = layout.result(binding)
-      else
-        response.body = File.read(path_to(content))
-      end
+  def erb?(path)
+    File.exist?(path) and path[-3 .. -1] == "erb"
+  end
+
+  def file?(path)
+    File.exist?(path)
+  end
+
+  #def page(path, content = nil, opts = {})
+  def mount(data, path = nil, opts = {})
+    if erb?(data) # parse and mount erb file
+      mount_erb(data, path, opts)
+    elsif file?(data) # mount file contents
+      mount_file(data, path, opts)
+    else # mount as simple text
+      mount_text(data, path, opts)
     end
   end
 
   def redirect(from, to, permanent = false)
-    mount(from) do |request, response|
+    mount_text("You are being redirected...", from) do |request, response|
       response.status = permanent ? 301 : 302
       response["Location"] = to
     end
   end
 
-  def mount(path, &block)
+  def mount_erb(file, path = nil, opts = {})
+    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
+    layout = layout(layout_name)
+    path ||= file.split(File::SEPARATOR)[3 .. -1].join(File::SEPARATOR)[0 .. -5]
+    path = "/%s" % [path] unless path[0, 1] == "/"
+    STDOUT.puts "Mounting ERB '%s' in '%s'" % [file, path]
     server.mount_proc(path) do |request, response|
-      yield request, response
+      @request, @response = request, response
+      yield request, response if block_given?
+      erb = ERB.new(File.read(file))
+      @content = erb.result(binding)
+      response.body = layout.result(binding)
+    end
+  end
+
+  def mount_file(file, path = nil, opts = {})
+    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
+    layout = layout(layout_name)
+    path ||= file.split(File::SEPARATOR)[3 .. -1].join(File::SEPARATOR)
+    path = "/%s" % [path] unless path[0, 1] == "/"
+    STDOUT.puts "Mounting file '%s' in '%s'" % [file, path]
+    server.mount_proc(path) do |request, response|
+      @request, @response = request, response
+      yield request, response if block_given?
+      text = File.read(file)
+      @content = text
+      response.body = layout.result(binding)
+    end
+  end
+
+  def mount_text(text, path, opts = {})
+    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
+    layout = layout(layout_name)
+    path = "/%s" % [path] unless path[0, 1] == "/"
+    STDOUT.puts "Mounting text in '%s'" % [path]
+    server.mount_proc(path) do |request, response|
+      @request, @response = request, response
+      yield request, response if block_given?
+      @content = text
+      response.body = layout.result(binding)
+    end
+  end
+
+  def automount(path = "")
+    path = File.join("test", "server", "root", path)
+    files = Dir[File.join(path, "**", "*.*")]
+    files.each do |file|
+      mount(file)
     end
   end
 
@@ -60,28 +106,17 @@ class WebServer
 end
 
 server = WebServer.new
-server.page("/simple_get", "simple_html.html.erb")
-server.page("/second_page", "second_page.html.erb")
-server.page("/nested_path/index.html", "nested_path.html.erb")
-server.page("/nested_path/nested_in.html", "nested_path.html.erb")
-server.page("/form", "form.html.erb")
-server.page("/form_without_method", "form_without_method.html.erb")
-server.page("/scoped_links", "scoped_links.html.erb")
-server.page("/doit", "doit.html.erb")
-server.page("/scoped_links", "scoped_links.html.erb")
-server.page("/form_header", "form_header.html.erb")
-server.page("/request_headers", "request_headers.html.erb")
-server.page("/cookies", "cookies.html.erb")
-server.page("/500", "simple_html.html.erb") { |_, response| response.status = 500 }
-server.page("/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
-server.page("/gzipped_page", "gzipped_response.html.gz") { |_, response| response["content-encoding"] = "gzip" }
-server.page("/set_cookie") do |req, resp|
-  req.query.each do |k, v|
-    v.each_data do |d|
-      resp.cookies << "#{k}=#{d}"
-    end
-  end
-end
+server.automount
+# server.mount("/500", "simple_html.html.erb") { |_, response| response.status = 500 }
+# server.mount("/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
+# server.mount("/gzipped_page", "gzipped_response.html.gz") { |_, response| response["content-encoding"] = "gzip" }
+# server.mount("/set_cookie") do |req, resp|
+  # req.query.each do |k, v|
+    # v.each_data do |d|
+      # resp.cookies << "#{k}=#{d}"
+    # end
+  # end
+# end
 server.redirect("/infinite_redirect", "/infinite_redirect")
 server.redirect("/single_redirect", "/simple_get")
 
