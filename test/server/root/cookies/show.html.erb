@@ -1,0 +1,3 @@
+<% @request.cookies.each do |cookie| %>
+  <%= "%s:%s" % [cookie.name, cookie.value] %>
+<% end %>

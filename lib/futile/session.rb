@@ -30,6 +30,7 @@ class Futile::Session
     @session = Net::HTTP.start(@uri.host, @uri.port)
     @max_redirects = opts[:max_redirects] || 10
     @default_browser = opts[:default_browser] || :firefox3
+    @cookies = {}
   end
 
   ##
@@ -258,7 +259,9 @@ class Futile::Session
 
   def process_cookies
     response.headers['set-cookie'].each do |cookie|
-      cookies << Futile::Cookie.parse(cookie)
+      cookie = Futile::Cookie.parse(cookie, @uri.host)
+      @cookies[cookie.domain] ||= Futile::CookieStore.new
+      @cookies[cookie.domain].insert(cookie)
     end if response.headers['set-cookie']
   end
 
@@ -267,9 +270,8 @@ class Futile::Session
   end
 
   def cookies
-    @cookies ||= {}
-    @cookies[@uri.host] ||= []
-    @cookies[@uri.host] = @cookies[@uri.host].select{|x| !x.expired?}
+    @cookies[@uri.host] ||= Futile::CookieStore.new
+    @cookies[@uri.host].cookies(@uri.path)
   end
 
   def assert_opts(opts, valid_keys)
