@@ -12,7 +12,8 @@ class WebServer
         :AccessLog => [],
     })
     ["INT", "TERM"].each { |signal| trap(signal) { server.shutdown } }
-    mount_text("", "favicon.ico")
+    mount_text("This is Futile TestServer", "/") # just to have root
+    mount_text("", "favicon.ico") # get rid of favicon ERROR
   end
 
   def layout(name)
