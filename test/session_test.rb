@@ -23,7 +23,8 @@ class SessionTest < Futile::TestCase
   def test_simple_get_after_redirection_is_not_redirection
     @futile.get("/single_redirect")
     assert @futile.redirected?
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
+    assert_equal 200, @futile.response.status
     assert ! @futile.redirected?
   end
 

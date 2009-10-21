@@ -19,7 +19,7 @@ class WebServer
     if name == false
       ERB.new("<%= @content %>")
     else
-      ERB.new(File.read(File.join("test", "server", "layouts", name)))
+      ERB.new(File.read(File.join("test", "server", "layouts", name || "layout.html.erb")))
     end
   end
 
@@ -31,7 +31,6 @@ class WebServer
     File.exist?(path)
   end
 
-  #def page(path, content = nil, opts = {})
   def mount(data, path = nil, opts = {})
     if erb?(data) # parse and mount erb file
       mount_erb(data, path, opts)
@@ -50,11 +49,9 @@ class WebServer
   end
 
   def mount_erb(file, path = nil, opts = {})
-    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
-    layout = layout(layout_name)
+    layout = layout(opts[:layout])
     path ||= file.split(File::SEPARATOR)[3 .. -1].join(File::SEPARATOR)[0 .. -5]
     path = "/%s" % [path] unless path[0, 1] == "/"
-    STDOUT.puts "Mounting ERB '%s' in '%s'" % [file, path]
     server.mount_proc(path) do |request, response|
       @request, @response = request, response
       yield request, response if block_given?
@@ -65,11 +62,9 @@ class WebServer
   end
 
   def mount_file(file, path = nil, opts = {})
-    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
-    layout = layout(layout_name)
+    layout = layout(opts[:layout])
     path ||= file.split(File::SEPARATOR)[3 .. -1].join(File::SEPARATOR)
     path = "/%s" % [path] unless path[0, 1] == "/"
-    STDOUT.puts "Mounting file '%s' in '%s'" % [file, path]
     server.mount_proc(path) do |request, response|
       @request, @response = request, response
       yield request, response if block_given?
@@ -80,10 +75,8 @@ class WebServer
   end
 
   def mount_text(text, path, opts = {})
-    layout_name = opts[:layout] == false ? "layout.html.erb" : opts[:layout] || "layout.html.erb"
-    layout = layout(layout_name)
+    layout = layout(opts[:layout])
     path = "/%s" % [path] unless path[0, 1] == "/"
-    STDOUT.puts "Mounting text in '%s'" % [path]
     server.mount_proc(path) do |request, response|
       @request, @response = request, response
       yield request, response if block_given?
@@ -109,6 +102,9 @@ server = WebServer.new
 server.automount
 server.mount_text("500 error", "/500") { |_, response| response.status = 500 }
 server.mount_text("enc", "/unknown_encoding") { |_, response| response["content-encoding"] = "nopez" }
+server.mount_file("test/server/root/gzipped_response.html.gz", "/gzipped_page.html", {:layout => false}) do |_, response|
+  response["content-encoding"] = "gzip"
+end
 server.mount_text("", "/set_cookie") do |req, resp|
   req.query.each do |k, v|
     v.each_data do |d|

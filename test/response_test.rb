@@ -2,20 +2,22 @@ require "test/test_helper.rb"
 
 class ResponseTest < Futile::TestCase
   def test_get
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
     assert @futile.response.body.include?("unique response 445d")
     assert_equal 200, @futile.response.status
   end
 
   def test_lazy_nokogiri_parsing
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
+    assert_equal 200, @futile.response.status
     @futile.response.instance_variables.each do |var|
       assert @futile.response.instance_variable_get(var).class.name !~ /nokogiri/i
     end
   end
 
   def test_lazy_nokogiri_parsing_after_body_get
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
+    assert_equal 200, @futile.response.status
     @futile.response.body
     @futile.response.instance_variables.each do |var|
       assert @futile.response.instance_variable_get(var).class.name !~ /nokogiri/i
@@ -23,7 +25,7 @@ class ResponseTest < Futile::TestCase
   end
 
   def test_gzipped_response
-    @futile.get("/gzipped_page")
+    @futile.get("/gzipped_page.html")
     assert_include("gzipped body", @futile.response.body)
   end
 

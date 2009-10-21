@@ -12,27 +12,27 @@ class HeadersTest < Futile::TestCase
     "user-agent"      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3",
   }.each do |header, value|
     define_method "test_firefox3_request_header_#{header.gsub("-", "_")}".to_sym do
-      @futile.get("/request_headers")
+      @futile.get("/request_headers.html")
       headers = parse_response_headers(@futile.response.body)
       assert_header(headers, header, value)
     end
   end
 
   def test_referer_sent
-    @futile.get("/simple_get")
+    @futile.get("/simple_html.html")
     @futile.click_link("referer")
-    assert_match(/simple_get/, @futile.response.body)
+    assert_match(/simple_html.html/, @futile.response.body)
   end
 
   def test_referer_not_sent_if_typed_in_address
-    @futile.get("/request_headers")
+    @futile.get("/request_headers.html")
     headers = parse_response_headers(@futile.response.body)
     assert ! headers.has_key?("referer")
   end
 
   def test_changes_user_agent_header
     @futile.headers.browser = :safari3
-    @futile.get("/request_headers")
+    @futile.get("/request_headers.html")
     headers = parse_response_headers(@futile.response.body)
     assert_header(headers, "user-agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_1; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9")
   end
@@ -115,7 +115,7 @@ class HeadersTest < Futile::TestCase
     "user-agent"      => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3",
   }.each do |header, value|
     define_method "test_firefox3_post_request_header_#{header.gsub("-", "_")}".to_sym do
-      @futile.get("/form_header")
+      @futile.get("/form_header.html")
       @futile.click_button("Headers")
       assert @futile.post?
       headers = parse_response_headers(@futile.response.body)
